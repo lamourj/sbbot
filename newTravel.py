@@ -38,7 +38,7 @@ def fromProposition(bot, update):
 def fromConfirm(bot, update):
     logger.info("Trying to leave from %s" % update.message.text)
     listFrom = qh.QueryHandler().getStationsFromName(update.message.text)
-    reply_keyboard = [listFrom]
+    reply_keyboard = [[el] for el in listFrom]
     print("We received these proposition" +listFrom)
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
