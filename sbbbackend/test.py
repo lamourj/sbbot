@@ -2,6 +2,7 @@
 
 from handlers import *
 from interfaces import *
+from data_structures import Connexion
 
 API_KEY = "V001CE953B0F-8B55-41EA-BD81-A366B72523BC"
 

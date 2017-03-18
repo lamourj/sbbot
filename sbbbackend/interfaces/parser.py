@@ -12,8 +12,11 @@ class Parser:
                 pdep = s['from']['platform']
                 parr = s['to']['platform']
                 route = s['route']
-                t = route['name']
-                i = route['infoName']
+                if route in not None:
+                    t = route['name']
+                    i = route['infoName']
+                else:
+                    continue
                 strRoute = t + i
                 dictSection = {'from': f, 'to': to, 'tid': strRoute, 'departureTime': tdep, 'arrivalTime': tarr, 'departurePlatform': pdep, 'arrivalPlatform': parr}
                 parsedSections.append(dictSection)
@@ -48,3 +51,7 @@ class Parser:
             minutes += 12*60
 
         return minutes
+
+    @staticmethod
+    def millisToMinutes(millis):
+        return millis * 1000 * 60
