@@ -5,7 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 from sbbCffBot import logger
 import sbbbackend.handlers.query_handler as qh
 
-PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(5)
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION, TO_PROPOSTION, TO_CONFIRMACTION, TO, VIA = range(7)
 
 def connectionType(bot, update):
     user = update.message.from_user
@@ -31,7 +31,7 @@ def fromProposition(bot, update):
     user = update.message.from_user
     logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
 
-    update.message.reply_text("Where will you be leaving from ?")
+    update.message.reply_text("Where will you be leaving from?")
 
     return FROM_CONFIRMACTION
 
@@ -39,10 +39,31 @@ def fromConfirm(bot, update):
     logger.info("Trying to leave from %s" % update.message.text)
     listFrom = qh.QueryHandler().getStationsFromName(update.message.text)
     reply_keyboard = [[el] for el in listFrom]
-    print("We received these proposition" +listFrom)
+    print("We received these proposition")
+    print(listFrom)
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    return ConversationHandler.END
+    return TO_PROPOSTION
+
+
+def toProposition(bot, update):
+    print("Hleloo")
+    user = update.message.from_user
+    logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
+
+    update.message.reply_text("Where will you be going to?")
+
+    return TO_CONFIRMACTION
+
+def toConfirm(bot, update):
+    logger.info("Trying to go to %s" % update.message.text)
+    listTo = qh.QueryHandler().getStationsFromName(update.message.text)
+    reply_keyboard = [[el] for el in listTo]
+    print("We received these proposition")
+    print(listTo)
+    update.message.reply_text("Please choose one of the following:", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    return ConversationHandler.END    
       
 
 def cancel(bot, update):
@@ -63,6 +84,10 @@ STATES={
     FROM_PROPOSTION: [RegexHandler('^(Confirmed|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
 
     FROM_CONFIRMACTION: [MessageHandler(Filters.text, fromConfirm)],
+
+    TO_PROPOSTION: [MessageHandler(Filters.text, toProposition)],
+
+    TO_CONFIRMACTION: [MessageHandler(Filters.text, toConfirm)],
 
     TO: [], 
     
