@@ -8,12 +8,20 @@ import re, datetime
 
 import sbbbackend.handlers.query_handler as qh
 import sbbbackend.interfaces.parser as parser
+import sbbbackend.interfaces.helper as helper
 
-PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, TIME, GET_CONNECTION = range(10) 
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, 
+TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, 
+TIME, GET_CONNECTION, CHOOSE_TRAIN= range(11) 
+
+NUMBER_OF_TRAINS = 3
+
+mapUserCurrent = {}
 
 def connectionType(bot, update):
     user = update.message.from_user
     logger.info("User %s started a new connection." % (user.first_name))
+
 
     reply_keyboard = [['/unique', '/weekly']]
     update.message.reply_text(
@@ -31,6 +39,10 @@ def pickDay(bot, update):
     return FROM_PROPOSTION
 
 def fromProposition(bot, update):
+    print("here we are")
+    print (update.message.text)
+    mapUserCurrent[str(update.message.from_user.id)] = {'typeOrWeekly': update.message.text}
+    print(mapUserCurrent)
     user = update.message.from_user
     logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
 
@@ -48,6 +60,8 @@ def fromConfirm(bot, update):
     return TO_PROPOSTION
 
 def toProposition(bot, update):
+    print(mapUserCurrent)
+    mapUserCurrent[str(update.message.from_user.id)]['from'] = update.message.text
     user = update.message.from_user
     logger.info("From of %s: %s" % (user.first_name, update.message.text))
 
@@ -66,6 +80,7 @@ def toConfirm(bot, update):
 
       
 def viaProposition(bot, update):
+    mapUserCurrent[str(update.message.from_user.id)]['to'] = update.message.text
     user = update.message.from_user
     logger.info("To of %s: %s" % (user.first_name, update.message.text))
 
@@ -94,13 +109,22 @@ def skipViaConfirm(bot, update):
     return ARRIVE_DEPART 
 
 def whenStartArrive(bot, update):
+    res = update.message.text
+    if res == 'Yes' or res == 'No': #only if not conrifmed
+        mapUserCurrent[str(update.message.from_user.id)]['via'] = None
+    else:
+        mapUserCurrent[str(update.message.from_user.id)]['via'] = update.message.text
+
     logger.info("Going via  %s" % update.message.text)
     reply_keyboard = [["Depart by ..h.."], ["Arrive by ..h.."]]
+
     update.message.reply_text("Do you want to arrive or depart by a certain time?", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return TIME
 
 def whenTime(bot, update):
+
+    mapUserCurrent[str(update.message.from_user.id)]['by'] =  update.message.text == "Depart by ..h.."
     logger.info("Wanting to \"%s\" " % update.message.text)
 
     update.message.reply_text("Please type the time you want to %s. Possible input ..:.., now" % update.message.text[:-8])
@@ -109,28 +133,47 @@ def whenTime(bot, update):
 
 def getConnection(bot, update):
     logger.info("Wanting to  leave at %s " % update.message.text)
-    present = datetime.datetime.now()
- 
+    time = datetime.datetime.now()
+    timeStr = ''
     # if re.match('^now$', update.message.text):
     if re.match('^\d:\d{0,2}$', update.message.text):
         h = int(update.message.text[0:1])
         m = int(update.message.text[2:])
-        if h > present.hour or (h == present.hour and m >= present.minute):
-            present = present.replace(hour = h, minute = m)
+        if h > time.hour or (h == time.hour and m >= time.minute):
+            time = time.replace(hour = h, minute = m)
         else:
-            present = present.replace(hour = h, minute = m) + datetime.timedelta(days=1)
+            time = time.replace(hour = h, minute = m) + datetime.timedelta(days=1)
+        timeStr = str(int(time.timestamp()*1000))
     elif re.match('^\d\d:\d{0,2}$', update.message.text):
         h = int(update.message.text[0:2])
         m = int(update.message.text[3:])
-        if h > present.hour or (h == present.hour and m >= present.minute):
-            present = present.replace(hour = h, minute = m)
+        if h > time.hour or (h == time.hour and m >= time.minute):
+            time = time.replace(hour = h, minute = m)
         else:
-            present = present.replace(hour = h, minute = m) + datetime.timedelta(days=1)
+            time = time.replace(hour = h, minute = m) + datetime.timedelta(days=1)
+        timeStr = str(int(time.timestamp()*1000))
+
+    elif update.message.text == 'now':
+        timeStr = None
     else:
         logger.warn("problem with time regex")
         return -1
-    print(present)
-    return ConversationHandler.END    
+
+    idReq = str(update.message.from_user.id)
+    mapUserCurrent[idReq]['time'] = timeStr
+    print(mapUserCurrent[idReq])
+    response = helper.Helper().getConnexionsStrings(NUMBER_OF_TRAINS, mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], mapUserCurrent[idReq]['by'])
+
+
+
+    update.message.reply_text("Do you want to arrive or depart by a certain time?", 
+        reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
+    return CHOOSE_TRAIN
+
+def chooseTrain(bot, update): 
+
+
+    return -1;
 
 
 def cancel(bot, update):
@@ -138,6 +181,8 @@ def cancel(bot, update):
     logger.info("User %s canceled the conversation." % user.first_name)
     update.message.reply_text('Bye! I hope we can talk again some day.',
                               reply_markup=ReplyKeyboardRemove())
+
+
 
     return ConversationHandler.END
 
@@ -165,7 +210,9 @@ STATES={
 
     TIME: [MessageHandler(Filters.text, whenTime)],
 
-    GET_CONNECTION: [MessageHandler(Filters.text, getConnection)]
+    GET_CONNECTION: [MessageHandler(Filters.text, getConnection)],
+
+    CHOOSE_TRAIN: [MessageHandler(Filters.text, chooseTrain)]
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]

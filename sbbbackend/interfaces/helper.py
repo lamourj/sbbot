@@ -1,5 +1,5 @@
-from interfaces import Parser
-from handlers import QueryHandler
+from .parser import Parser
+from sbbbackend.handlers import QueryHandler
 
 class Helper:
     qhandler = QueryHandler()
@@ -24,6 +24,6 @@ class Helper:
                 strings_for_connexion.append(s)
                 first = False
             strings.append(strings_for_connexion)
-
+        print(strings)
         return strings
         
