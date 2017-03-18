@@ -19,11 +19,10 @@ class Helper:
                 s = ""
                 if not first:
                     s = s + '\n'
-                s = s + c['tid'] + ' : ' + c['from'] + " plt. " + c['departurePlatform'] + ' ' + c['departureTime'] + '\n'
+                s = s + c['departureTime'] + ' ' + c['tid'] + ' : ' + c['from'] + " plt. " + c['departurePlatform'] + '\n'
                 s = s + 'to ' + c['to'] + " plt. " + c['arrivalPlatform'] + ' ' + c['arrivalTime'] + '\n'
                 strings_for_connexion.append(s)
                 first = False
             strings.append(strings_for_connexion)
         print(strings)
         return strings
-        
