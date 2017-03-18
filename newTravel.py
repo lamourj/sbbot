@@ -4,7 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 from sbbCffBot import logger
 
-import re, arrow
+import re, datetime
 
 import sbbbackend.handlers.query_handler as qh
 import sbbbackend.interfaces.parser as parser
@@ -103,21 +103,34 @@ def whenStartArrive(bot, update):
 def whenTime(bot, update):
     logger.info("Wanting to \"%s\" " % update.message.text)
 
-    update.message.reply_text("Please type the time you want to %s. Possible input ..h.., now, in .. hours " % update.message.text[:-8])
-    return ConversationHandler.END    
+    update.message.reply_text("Please type the time you want to %s. Possible input ..:.., now" % update.message.text[:-8])
+    return GET_CONNECTION
+
 
 def getConnection(bot, update):
     logger.info("Wanting to  leave at %s " % update.message.text)
-    if re.match('^now$'):
-        present = arrow.now()
-        time = present.hour + ":" + prensent.minute
-    elif re.match('^in \d{1,2} hours$'):
-        print()
-    elif re.match('^\d{0,2}h\d{0,2}$'):
-        print()
+    present = datetime.datetime.now()
+ 
+    # if re.match('^now$', update.message.text):
+    if re.match('^\d:\d{0,2}$', update.message.text):
+        h = int(update.message.text[0:1])
+        m = int(update.message.text[2:])
+        if h > present.hour or (h == present.hour and m >= present.minute):
+            present = present.replace(hour = h, minute = m)
+        else:
+            present = present.replace(hour = h, minute = m) + datetime.timedelta(days=1)
+    elif re.match('^\d\d:\d{0,2}$', update.message.text):
+        h = int(update.message.text[0:2])
+        m = int(update.message.text[3:])
+        if h > present.hour or (h == present.hour and m >= present.minute):
+            present = present.replace(hour = h, minute = m)
+        else:
+            present = present.replace(hour = h, minute = m) + datetime.timedelta(days=1)
     else:
         logger.warn("problem with time regex")
-
+        return -1
+    print(present)
+    return ConversationHandler.END    
 
 
 def cancel(bot, update):
@@ -152,7 +165,7 @@ STATES={
 
     TIME: [MessageHandler(Filters.text, whenTime)],
 
-    GET_CONNECTION: [RegexHandler('^(now|in \d{1,2} hours|\d{1,2}h\d{1,2}|\d{1,2}:\d{1,2})$', getConnection)]
+    GET_CONNECTION: [MessageHandler(Filters.text, getConnection)]
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]
