@@ -16,9 +16,8 @@ class RequestsHandler:
         fullurl = "https://{}/v1{}".format(self.baseurl, reqstring)
         fullurl = fullurl + "&apiKeyWeb=" + self.apikey
         r = requests.get(fullurl)
+        response = r.json()
         if r.status_code != 200:
-            response = r.json()
-            print (response)
             raise RequestError(response["status"], response["error"], response["message"])
         else:
-            print("Success.")
+            return response
