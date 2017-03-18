@@ -1,5 +1,5 @@
 from urllib.request import quote as urlqt
-from .requests_handler import RequestsHandler
+from .request_handler import RequestHandler
 
 class QueriesHandler:
     """
@@ -9,7 +9,7 @@ class QueriesHandler:
     def __init__(self):
         # TODO : Pass key as arg 
         apikey = "V001CE953B0F-8B55-41EA-BD81-A366B72523BC"
-        self.reqhandler = RequestsHandler(apikey)
+        self.reqhandler = RequestHandler(apikey)
 
 
     """

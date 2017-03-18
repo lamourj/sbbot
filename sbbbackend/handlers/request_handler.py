@@ -1,7 +1,7 @@
 import requests
 from .request_error import RequestError
 
-class RequestsHandler:
+class RequestHandler:
     """ Makes requests to the API using HTTPS. """
 
     def __init__(self, apikey):
