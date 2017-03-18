@@ -5,6 +5,13 @@ class Helper:
     qhandler = QueryHandler()
 
     @staticmethod
+    def getOrElse(d, k, e):
+        if k in d.keys():
+            return str(d[k])
+        else:
+            return e
+
+    @staticmethod
     def getConnexionsStrings(n, fromStation, toStation, viaStation=None, time=None, departure=True):
         response = Helper.qhandler.getConnexion(fromStation, toStation, viaStation, time, departure)
         connexions = response['connections'][:n]
@@ -19,8 +26,23 @@ class Helper:
                 s = ""
                 if not first:
                     s = s + '\n'
-                s = s + c['departureTime'] + ' ' + c['tid'] + ' : ' + c['from'] + " plt. " + c['departurePlatform'] + ' '
-                s = s + 'to ' + c['to'] + " plt. " + c['arrivalPlatform'] + ' ' + c['arrivalTime'] + ' '
+                s = s +  c['departureTime']
+                s = s +  ' ' 
+                if c['tid'] is not None:
+                    s = s +  c['tid']
+                s = s +  ' : ' 
+                s = s +  c['from']
+                if c['departurePlatform'] is not None:
+                    s = s +  " plt. " 
+                    s = s +  c['departurePlatform'] 
+                s = s +  ' to ' 
+                s = s +  c['to'] 
+                if c['arrivalPlatform'] is not None:
+                    s = s +  " plt. " 
+                    s = s +  c['arrivalPlatform'] 
+                s = s +  ' ' 
+                s = s +  c['arrivalTime'] 
+                s = s +  ' '
                 strings_for_connexion.append(s)
                 first = False
             strings.append(strings_for_connexion)
