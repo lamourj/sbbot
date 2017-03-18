@@ -15,7 +15,7 @@ class DayTable:
         self.isRegular = isRegular
 
 
-    def addConnexionForDay(self, uid, tid, connexion):
+    def addConnexionForDay(self, tid, uid, connexion):
         """
         Adds a connexion for this day for singular user.
         """

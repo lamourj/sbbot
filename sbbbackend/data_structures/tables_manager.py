@@ -24,6 +24,7 @@ class TablesManager:
         and user ID (uid) at the singular day of week (mon, tue, wed, thu,
         fri, sat, sun).
         """
+        assert dayOfWeek in validDaysOfWeek, dayOfWeek + " is not a valid day of week."
         self.regularTables[dayOfWeek].addConnexionForDay(uid, tid, connexion)
 
     def addSingularEntry(self, dayOfYear, tid, uid, connexion):
@@ -31,6 +32,7 @@ class TablesManager:
         Adds the specified singular connexion for specified train ID (tid)
         and user ID (uid) at the singular day of year (1,...,365)
         """
+        assert dayOfYear >= 0 and dayOfYear < 366, str(dayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
         if dayOfYear not in self.singularTables:
             self.singularTables[dayOfYear] = DayTable(isRegular=False)
         self.singularTables[dayOfYear].addConnexionForDay(uid, tid, connexion)
