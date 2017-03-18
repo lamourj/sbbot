@@ -1,4 +1,4 @@
-import connexion ## TODO: fix import
+from connexion import Connexion ## TODO: fix import
 
 class DayTable:
     """
@@ -17,9 +17,21 @@ class DayTable:
 
     def addConnexionForDay(self, uid, tid, connexion):
         """
-        Add a connexion for this day for specific user.
+        Adds a connexion for this day for specific user.
         """
         if tid not in self.table:
             self.table[tid] = []
         if uid not in self.table[tid]:
             self.table[tid].append((uid, connexion))
+
+    def getUsersAndConnexionsForTid(self, tid):
+        """
+        Returns the pairs of (uid, connexion) that are
+        using the train having the specified tid or None
+        if there is no users for this train.
+        """
+
+        if tid in self.table:
+            return self.table[tid]
+        else:
+            return None

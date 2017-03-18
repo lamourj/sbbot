@@ -1,4 +1,4 @@
-class Friends:
+class FriendsTable:
 """
 Handles relations of friends for users.
 """
@@ -16,3 +16,13 @@ Handles relations of friends for users.
                 self.table[uid].append(friendUid)
         else:
             self.table[uid] = [friendUid]
+
+    def getFriendsForUser(self, uid):
+        """
+        Returns the friends uids for specified uid or None if
+        uid has no registrated friends.
+        """
+        if uid in self.table:
+            return self.table[uid]
+        else:
+            return None
