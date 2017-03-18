@@ -1,6 +1,7 @@
 from .day_table import DayTable
 from .train_table import TrainTable
 from .connexion import Connexion
+from .interfaces import Parser
 
 class TablesManager:
     """
@@ -14,7 +15,7 @@ class TablesManager:
         regular journeys.
         Initializes a dict of tables for singular entries.
         """
-        self.validDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+        self.validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
         assert currentDayOfWeek in self.validDays, currentDayOfWeek + " is not a valid day of week."
         assert currentDayOfYear >= 0 and currentDayOfYear < 366, str(currentDayOfYear) + " is not a valid day expected: 0 <= currentDayOfYear < 366."
@@ -32,7 +33,24 @@ class TablesManager:
         self.todaysTable = DayTable()
         self.setTodaysDate(currentDayOfWeek, currentDayOfYear)
 
-    def addRegularEntry(self, dayOfWeek, tid, uid, connexion):
+    def addRegularEntry(self, dayOfWeek, uid, json):
+        # def __init__(self, tid, departure, arrival, departureTime, arrivalTime):
+        sections = Parser.parseConnexion(json)['sections']
+        connexions = []
+        for section in sections:
+            tid = section['tid']
+            departure = section['from']
+            arrival = section['to']
+            departureTime = section['departureTime']
+            arrivalTime = section['arrivalTime']
+            departurePlatform = section['departurePlatform']
+            arrivalPlatform = section['arrivalPlatform']
+            
+            newConnexion = 
+
+
+
+    def addRegularEntryHelper(self, dayOfWeek, uid, connexion):
         """
         Adds the specified regular connexion for specified train ID (tid) 
         and user ID (uid) at the singular day of week (mon, tue, wed, thu,
@@ -42,12 +60,13 @@ class TablesManager:
 
         if dayOfWeek == self.currentDayOfWeek: 
             # If dayOfWeek is today, have to add current travel to today's table
-            self.todaysTable.addConnexionForDay(uid, tid, connexion)
+            self.todaysTable.addConnexionForDay(uid, connexion.tid, connexion)
 
         self.todaysTrainTable.addConnexion(connexion)
-        self.regularTables[dayOfWeek].addConnexionForDay(uid, tid, connexion)
+        self.regularTables[dayOfWeek].addConnexionForDay(uid, connexion.tid, connexion)
 
-    def addSingularEntry(self, dayOfYear, tid, uid, connexion):
+
+    def addSingularEntryHelper(self, dayOfYear, uid, connexion):
         """
         Adds the specified singular connexion for specified train ID (tid)
         and user ID (uid) at the singular day of year (1,...,365)
@@ -56,7 +75,7 @@ class TablesManager:
 
         if dayOfYear == self.currentDayOfYear: 
             # If dayOfYear is today, have to add current travel to today's table
-            self.todaysTable.addConnexionForDay(uid, tid, connexion)
+            self.todaysTable.addConnexionForDay(uid, connexion.tid, connexion)
 
 
         if dayOfYear not in self.singularTables:
