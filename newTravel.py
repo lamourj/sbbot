@@ -25,6 +25,7 @@ def pickDay(bot, update):
 
     return FROM_PROPOSTION
 
+
 def fromProposition(bot, update):
     user = update.message.from_user
     logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
@@ -52,7 +53,7 @@ ENTRY_POINTS = [CommandHandler('newConnection', connectionType),
 STATES={
     PICK_DAY: [RegexHandler('^(Unique|Weekly)$', pickDay)],
 
-    FROM_PROPOSTION: [RegexHandler('^(Unique|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
+    FROM_PROPOSTION: [RegexHandler('^(Confirmed|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
 
     FROM_CONFIRMACTION: [MessageHandler(Filters.text, fromConfirm)],
 
