@@ -10,7 +10,7 @@ def newFriend(bot, update):
     user = update.message.from_user
     logger.info("User %s started a new connection." % (user.first_name))
 
-    reply_keyboard = [[KeyboardButton(text="send_contact", request_contact=True)]]
+    reply_keyboard = [[KeyboardButton(text="send_contact", mapUserCurrent_contact=True)]]
     update.message.reply_text(
         'Choose a contact to add?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))

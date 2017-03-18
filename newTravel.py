@@ -15,6 +15,7 @@ TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, \
 TIME, GET_CONNECTION, CHOOSE_TRAIN= range(11) 
 
 NUMBER_OF_TRAINS = 3
+NO_CONNECTION_MESSAGE = "Quit :-/"
 
 mapUserCurrent = {}
 
@@ -132,7 +133,8 @@ def whenTime(bot, update):
 
 
 def getConnection(bot, update):
-    logger.info("Wanting to  leave at %s " % update.message.text)
+    idReq = str(update.message.from_user.id)
+    logger.info("Wanting to  %s at %s " % (mapUserCurrent[idReq]['by'] , update.message.text))
     time = datetime.datetime.now()
     timeStr = ''
     # if re.match('^now$', update.message.text):
@@ -159,25 +161,27 @@ def getConnection(bot, update):
         logger.warn("problem with time regex")
         return -1
 
-    idReq = str(update.message.from_user.id)
     mapUserCurrent[idReq]['time'] = timeStr
     print(mapUserCurrent[idReq])
-    try:
-        response = helper.Helper().getConnexionsStrings(NUMBER_OF_TRAINS, 
-            mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
-            mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], 
-            mapUserCurrent[idReq]['by'])
-        update.message.reply_text("Which train do you want?", 
-            reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
-    except:
-        logger.warn("error somewhere")
-        update.message.reply_text("No connection available?", 
-            reply_markup=ReplyKeyboardMarkup([[Quit]], one_time_keyboard=True))
+    # try:
+    response = helper.Helper().getConnexionsStrings(NUMBER_OF_TRAINS, 
+        mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
+        mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], 
+        mapUserCurrent[idReq]['by'])
+    update.message.reply_text("Which train do you want?", 
+        reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
+    # except:
+    #     logger.warn("error somewhere")
+    #     update.message.reply_text("No connection available?", 
+    #         reply_markup=ReplyKeyboardMarkup([[NO_CONNECTION_MESSAGE]], one_time_keyboard=True))
 
     return CHOOSE_TRAIN
 
 def chooseTrain(bot, update): 
-    
+    msg = update.message.text
+    if not msg == NO_CONNECTION_MESSAGE:
+        # callFUNTION à JULLIEN(msg, update.message.from_user.id)
+        x = "do nothing"
 
     return -1;
 
