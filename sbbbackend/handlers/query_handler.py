@@ -1,7 +1,7 @@
 from urllib.request import quote as urlqt
 from .request_handler import RequestHandler
 
-class QueriesHandler:
+class QueryHandler:
     """
     Returns queries to be submitted to viadi API
     """
