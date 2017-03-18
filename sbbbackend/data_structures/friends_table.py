@@ -19,10 +19,10 @@ class FriendsTable:
 
     def getFriendsForUser(self, uid):
         """
-        Returns the friends uids for specified uid or None if
+        Returns the friends uids for specified uid or [] if
         uid has no registrated friends.
         """
         if uid in self.table:
             return self.table[uid]
         else:
-            return None
+            return []

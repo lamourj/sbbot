@@ -25,3 +25,11 @@ class Parser:
 
         parsed['sections'] = [] + parseSections(connexion['sections'])
         return parsed
+
+
+    @staticmethod
+    def parseStations(stations):
+        parsedStations = []
+        for i in range(len(stations)):
+            parsedStations.append(stations[i]['name'])
+        return parsedStations
