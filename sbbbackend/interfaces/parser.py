@@ -8,8 +8,11 @@ class Parser:
                 f = s['from']['location']['name']
                 to = s['to']['location']['name']
                 route = s['route']
-                t = route['name']
-                i = route['infoName']
+                if route in not None:
+                    t = route['name']
+                    i = route['infoName']
+                else:
+                    continue
                 strRoute = t + i
                 dictSection = {'from': f, 'to': to, 'tid': strRoute}
                 parsedSections.append(dictSection)
@@ -23,7 +26,7 @@ class Parser:
         parsed['departurePlatform'] = connexion['from']['platform']
         parsed['arrivalPlatform'] = connexion['to']['platform']
 
-        parsed['sections'] = [] + parseSections(connexion['sections'])
+        parsed['sections'] = parseSections(connexion['sections'])
         return parsed
 
 
