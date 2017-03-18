@@ -34,9 +34,7 @@ class TablesManager:
         self.setTodaysDate(currentDayOfWeek, currentDayOfYear)
 
     def addRegularEntry(self, dayOfWeek, uid, json):
-        # def __init__(self, tid, departure, arrival, departureTime, arrivalTime):
         sections = Parser.parseConnexion(json)['sections']
-        connexions = []
         for section in sections:
             tid = section['tid']
             departure = section['from']
@@ -45,10 +43,12 @@ class TablesManager:
             arrivalTime = section['arrivalTime']
             departurePlatform = section['departurePlatform']
             arrivalPlatform = section['arrivalPlatform']
-            
-            newConnexion = 
 
+            departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
+            arrivalTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(arrivalTime))
+            newConnexion = Connexion(tid, departure, arrival, departureTime, arrivalTime, departurePlatform, arrivalPlatform)
 
+            addRegularEntryHelper(self, dayOfWeek, uid, newConnexion)
 
     def addRegularEntryHelper(self, dayOfWeek, uid, connexion):
         """
@@ -64,6 +64,24 @@ class TablesManager:
 
         self.todaysTrainTable.addConnexion(connexion)
         self.regularTables[dayOfWeek].addConnexionForDay(uid, connexion.tid, connexion)
+
+
+    def addSingularEntry(self, uid, json):
+        sections = Parser.parseConnexion(json)['sections']
+
+        for section in sections:
+            tid = section['tid']
+            departure = section['from']
+            arrival = section['to']
+            departureTime = section['departureTime']
+            arrivalTime = section['arrivalTime']
+            departurePlatform = section['departurePlatform']
+            arrivalPlatform = section['arrivalPlatform']
+
+            newConnexion = Connexion(tid, departure, arrival, departureTime, arrivalTime, departurePlatform, arrivalPlatform)
+
+            dayOfYear = Parser.parseHumanReadableTimeToDayOfYear(departureTime)
+            addSingularEntryHelper(self, dayOfYear, uid, newConnexion)
 
 
     def addSingularEntryHelper(self, dayOfYear, uid, connexion):
