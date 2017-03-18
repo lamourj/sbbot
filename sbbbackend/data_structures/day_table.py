@@ -7,13 +7,11 @@ class DayTable:
     """
 
 
-    def __init__(self, isRegular):
-        """
-        isRegular == True if this table stores regular connexions.
-        """
-        self.table = dict()
-        self.isRegular = isRegular
-
+    def __init__(self, table=None):
+        if(table=None):
+            self.table = dict()
+        else:
+            self.table = table.copy()
 
     def addConnexionForDay(self, tid, uid, connexion):
         """
@@ -35,3 +33,6 @@ class DayTable:
             return self.table[tid]
         else:
             return []
+
+    def getTable(self):
+        return self.table.copy()
