@@ -7,6 +7,10 @@ class Parser:
             for s in sections:
                 f = s['from']['location']['name']
                 to = s['to']['location']['name']
+                tdep = s['from']['debugHumanReadableTime']
+                tarr = s['to']['debugHumanReadableTime']
+                pdep = s['from']['platform']
+                parr = s['to']['platform']
                 route = s['route']
                 if route in not None:
                     t = route['name']
@@ -14,7 +18,7 @@ class Parser:
                 else:
                     continue
                 strRoute = t + i
-                dictSection = {'from': f, 'to': to, 'tid': strRoute}
+                dictSection = {'from': f, 'to': to, 'tid': strRoute, 'departureTime': tdep, 'arrivalTime': tarr, 'departurePlatform': pdep, 'arrivalPlatform': parr}
                 parsedSections.append(dictSection)
             return parsedSections
 
@@ -36,7 +40,6 @@ class Parser:
         for i in range(len(stations)):
             parsedStations.append(stations[i]['name'])
         return parsedStations
-
 
     @staticmethod
     def parseHumanReadableTime(hrTime):

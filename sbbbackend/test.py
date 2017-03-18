@@ -7,13 +7,13 @@ from data_structures import Connexion
 API_KEY = "V001CE953B0F-8B55-41EA-BD81-A366B72523BC"
 
 def main():
-    # handler = QueryHandler()
-    # json = handler.getConnexion("Aigle", "Zürich")
-    # json = handler.getStationsFromName("Zürich")
-    # print(Parser.parseStations(json))
+    helper = Helper() 
+    strings = helper.getConnexionsStrings(2, "Aigle", "Zürich")
 
-    # print(json)
-
+    for ss in strings:
+        print ('###########')
+        for s in ss:
+            print(s)
     # connexion = json['connections'][0]
     # parsed = Parser.parseConnexion(connexion)
     # print(parsed)
