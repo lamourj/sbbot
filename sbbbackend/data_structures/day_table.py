@@ -1,4 +1,4 @@
-from connexion import Connexion ## TODO: fix import
+from connexion import Connexion 
 
 class DayTable:
     """
@@ -27,11 +27,11 @@ class DayTable:
     def getUsersAndConnexionsForTid(self, tid):
         """
         Returns the pairs of (uid, connexion) that are
-        using the train having the specified tid or None
+        using the train having the specified tid or []
         if there is no users for this train.
         """
 
         if tid in self.table:
             return self.table[tid]
         else:
-            return None
+            return []
