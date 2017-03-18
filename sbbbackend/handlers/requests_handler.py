@@ -18,6 +18,7 @@ class RequestsHandler:
         r = requests.get(fullurl)
         response = r.json()
         if r.status_code != 200:
+            print(response)
             raise RequestError(response["status"], response["error"], response["message"])
         else:
             return response
