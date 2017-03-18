@@ -7,11 +7,15 @@ class Parser:
             for s in sections:
                 f = s['from']['location']['name']
                 to = s['to']['location']['name']
+                tdep = s['from']['debugHumanReadableTime']
+                tarr = s['to']['debugHumanReadableTime']
+                pdep = s['from']['platform']
+                parr = s['to']['platform']
                 route = s['route']
                 t = route['name']
                 i = route['infoName']
                 strRoute = t + i
-                dictSection = {'from': f, 'to': to, 'tid': strRoute}
+                dictSection = {'from': f, 'to': to, 'tid': strRoute, 'departureTime': tdep, 'arrivalTime': tarr, 'departurePlatform': pdep, 'arrivalPlatform': parr}
                 parsedSections.append(dictSection)
             return parsedSections
 
