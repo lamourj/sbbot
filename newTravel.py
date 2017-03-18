@@ -6,9 +6,9 @@ from sbbCffBot import logger
 
 import re, datetime
 
-import sbbbackend.handlers.query_handler as qh
-import sbbbackend.interfaces.parser as parser
-import sbbbackend.interfaces.helper as helper
+import handlers.query_handler as qh
+import interfaces.parser as parser
+import interfaces.helper as helper
 
 PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, \
 TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, \

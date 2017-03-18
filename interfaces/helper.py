@@ -1,5 +1,5 @@
 from .parser import Parser
-from sbbbackend.handlers import QueryHandler
+from handlers import QueryHandler
 
 class Helper:
     qhandler = QueryHandler()
