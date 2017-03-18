@@ -7,7 +7,7 @@ from sbbCffBot import logger
 import sbbbackend.handlers.query_handler as qh
 import sbbbackend.interfaces.parser as parser
 
-PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION, TO_PROPOSTION, TO_CONFIRMACTION, TO, VIA = range(7)
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION = range(7)
 
 def connectionType(bot, update):
     user = update.message.from_user
@@ -35,40 +35,61 @@ def fromProposition(bot, update):
 
     update.message.reply_text("Where will you be leaving from?")
 
-    return FROM_CONFIRMACTION
+    return FROM_CONFIRMATION
 
 def fromConfirm(bot, update):
     logger.info("Trying to leave from %s" % update.message.text)
     listFrom = qh.QueryHandler().getStationsFromName(update.message.text)
     listFrom = parser.Parser().parseStations(listFrom)
     reply_keyboard = [[el] for el in listFrom]
-    print("We received these proposition")
-    print(listFrom)
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return TO_PROPOSTION
 
 
 def toProposition(bot, update):
-    print("Hleloo")
     user = update.message.from_user
-    logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
+    logger.info("From of %s: %s" % (user.first_name, update.message.text))
 
     update.message.reply_text("Where will you be going to?")
 
-    return TO_CONFIRMACTION
+    return TO_CONFIRMATION
 
 def toConfirm(bot, update):
     logger.info("Trying to go to %s" % update.message.text)
     listTo = qh.QueryHandler().getStationsFromName(update.message.text)
     listTo = parser.Parser().parseStations(listTo)
     reply_keyboard = [[el] for el in listTo]
-    print("We received these proposition")
-    print(listTo)
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    return ConversationHandler.END    
+    return VIA_PROPOSTION     
       
+def viaProposition(bot, update):
+    user = update.message.from_user
+    logger.info("To of %s: %s" % (user.first_name, update.message.text))
+
+    update.message.reply_text("Use /skip if you do not need to stop in between" +
+            " (via), otherwise please enter where you'd wish to stop")
+
+    return VIA_CONFIRMATION  
+
+def viaConfirm(bot, update):
+    logger.info("Trying to go via %s" % update.message.text)
+    listTo = qh.QueryHandler().getStationsFromName(update.message.text)
+    listTo = parser.Parser().parseStations(listTo)
+    reply_keyboard = [[el] for el in listTo]
+    update.message.reply_text("Please choose one of the following:", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    return      
+
+def skipViaConfirm(bot, update):
+    reply_keyboard = [['Yes', 'No']]
+
+    update.message.reply_text(
+        'Are you sure ?',
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
+    return 
 
 def cancel(bot, update):
     user = update.message.from_user
@@ -87,13 +108,16 @@ STATES={
 
     FROM_PROPOSTION: [RegexHandler('^(Confirmed|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
 
-    FROM_CONFIRMACTION: [MessageHandler(Filters.text, fromConfirm)],
+    FROM_CONFIRMATION: [MessageHandler(Filters.text, fromConfirm)],
 
     TO_PROPOSTION: [MessageHandler(Filters.text, toProposition)],
 
-    TO_CONFIRMACTION: [MessageHandler(Filters.text, toConfirm)],
+    TO_CONFIRMATION: [MessageHandler(Filters.text, toConfirm)],
     
-    VIA: []
+    VIA_PROPOSTION: [MessageHandler(Filters.text, viaProposition)],
+
+    VIA_CONFIRMATION: [MessageHandler(Filters.text, viaConfirm), 
+        CommandHandler('skip', skipViaConfirm)]
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]
