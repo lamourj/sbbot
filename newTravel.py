@@ -4,10 +4,12 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 from sbbCffBot import logger
 
+import re, arrow
+
 import sbbbackend.handlers.query_handler as qh
 import sbbbackend.interfaces.parser as parser
 
-PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION, TO_PROPOSTION, TO_CONFIRMACTION, TO, VIA = range(7)
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION, TO_PROPOSTION, TO_CONFIRMACTION, TO, VIA, ARRIVE_DEPART, TIME = range(9)
 
 def connectionType(bot, update):
     user = update.message.from_user
@@ -67,8 +69,35 @@ def toConfirm(bot, update):
     print(listTo)
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    return ConversationHandler.END    
+    return ARRIVE_DEPART  
+
+def whenStartArrive(bot, update):
+    logger.info("Going to %s" % update.message.text)
+    reply_keyboard = [["Depart by ..h.."], ["Arrive by ..h.."]]
+    update.message.reply_text("Do you want to arrive or depart by a certain time?", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    return TIME
       
+
+def whenTime(bot, update):
+    logger.info("Wanting to \"%s\" " % update.message.text)
+
+    update.message.reply_text("Please type the time you want to %s. Possible input ..h.., now, in .. hours " % update.message.text[:-8])
+    return ConversationHandler.END    
+
+def getConnexion(bot, update):
+    logger.info("Wanting to  leave at %s " % update.message.text)
+    if re.match('^now$'):
+        present = arrow.now()
+        time = present.hour + ":" + prensent.minute
+    elif re.match('^in \d{1,2} hours$'):
+        print()
+    elif re.match('^\d{0,2}h\d{0,2}$'):
+        print()
+    else:
+        logger.warn("problem with time regex")
+
+
 
 def cancel(bot, update):
     user = update.message.from_user
@@ -93,7 +122,11 @@ STATES={
 
     TO_CONFIRMACTION: [MessageHandler(Filters.text, toConfirm)],
     
-    VIA: []
+    VIA: [],
+
+    ARRIVE_DEPART: [MessageHandler(Filters.text, whenStartArrive)],
+
+    TIME: [RegexHandler('^(now|in \d{1,2} hours|\d{0,2}h\d{0,2})$', getConnexion)]
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]

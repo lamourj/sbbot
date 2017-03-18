@@ -43,7 +43,6 @@ def main():
 
     dp = updater.dispatcher
 
-    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
         entry_points=NT.ENTRY_POINTS,
         states= NT.STATES,
