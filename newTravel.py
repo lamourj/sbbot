@@ -10,8 +10,8 @@ import sbbbackend.handlers.query_handler as qh
 import sbbbackend.interfaces.parser as parser
 import sbbbackend.interfaces.helper as helper
 
-PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, 
-TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, 
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, \
+TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, \
 TIME, GET_CONNECTION, CHOOSE_TRAIN= range(11) 
 
 NUMBER_OF_TRAINS = 3
@@ -153,7 +153,7 @@ def getConnection(bot, update):
             time = time.replace(hour = h, minute = m) + datetime.timedelta(days=1)
         timeStr = str(int(time.timestamp()*1000))
 
-    elif update.message.text == 'now':
+    elif re.match('^(?i)now$', update.message.text):
         timeStr = None
     else:
         logger.warn("problem with time regex")
@@ -162,16 +162,22 @@ def getConnection(bot, update):
     idReq = str(update.message.from_user.id)
     mapUserCurrent[idReq]['time'] = timeStr
     print(mapUserCurrent[idReq])
-    response = helper.Helper().getConnexionsStrings(NUMBER_OF_TRAINS, mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], mapUserCurrent[idReq]['by'])
+    try:
+        response = helper.Helper().getConnexionsStrings(NUMBER_OF_TRAINS, 
+            mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
+            mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], 
+            mapUserCurrent[idReq]['by'])
+        update.message.reply_text("Which train do you want?", 
+            reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
+    except:
+        logger.warn("error somewhere")
+        update.message.reply_text("No connection available?", 
+            reply_markup=ReplyKeyboardMarkup([[Quit]], one_time_keyboard=True))
 
-
-
-    update.message.reply_text("Do you want to arrive or depart by a certain time?", 
-        reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
     return CHOOSE_TRAIN
 
 def chooseTrain(bot, update): 
-
+    
 
     return -1;
 
