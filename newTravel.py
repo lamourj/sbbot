@@ -3,6 +3,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
                           ConversationHandler, CallbackQueryHandler)
 
 from sbbCffBot import logger
+
 import sbbbackend.handlers.query_handler as qh
 
 PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION, TO_PROPOSTION, TO_CONFIRMACTION, TO, VIA = range(7)
@@ -88,8 +89,6 @@ STATES={
     TO_PROPOSTION: [MessageHandler(Filters.text, toProposition)],
 
     TO_CONFIRMACTION: [MessageHandler(Filters.text, toConfirm)],
-
-    TO: [], 
     
     VIA: []
 }
