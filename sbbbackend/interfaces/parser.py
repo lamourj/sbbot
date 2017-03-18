@@ -12,7 +12,7 @@ class Parser:
                 pdep = s['from']['platform']
                 parr = s['to']['platform']
                 route = s['route']
-                if route in not None:
+                if route is not None:
                     t = route['name']
                     i = route['infoName']
                 else:
