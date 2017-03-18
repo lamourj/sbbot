@@ -2,8 +2,8 @@ from connexion import Connexion ## TODO: fix import
 
 class DayTable:
     """
-    Handles set of user to care about for a specific day and which trains
-    users are interested in.
+        Handles set of user to care about for a singular day and which trains
+        users are interested in.
     """
 
 
@@ -17,7 +17,7 @@ class DayTable:
 
     def addConnexionForDay(self, uid, tid, connexion):
         """
-        Adds a connexion for this day for specific user.
+        Adds a connexion for this day for singular user.
         """
         if tid not in self.table:
             self.table[tid] = []
