@@ -152,7 +152,7 @@ STATES={
 
     TIME: [MessageHandler(Filters.text, whenTime)],
 
-    GET_CONNECTION: [RegexHandler('^(now|in \d{1,2} hours|\d{1,2}h\d{1,2}|\d{1,2}:\d{1,2}$', getConnection)]
+    GET_CONNECTION: [RegexHandler('^(now|in \d{1,2} hours|\d{1,2}h\d{1,2}|\d{1,2}:\d{1,2})$', getConnection)]
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]
