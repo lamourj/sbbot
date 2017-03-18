@@ -31,7 +31,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
         level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-tablesManager = TablesManager('sun', 77)
+tablesManager = TablesManager('Sunday', 77)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))

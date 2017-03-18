@@ -1,7 +1,7 @@
 from .day_table import DayTable
 from .train_table import TrainTable
 from .connexion import Connexion
-from .interfaces import Parser
+from interfaces import Parser
 
 class TablesManager:
     """
