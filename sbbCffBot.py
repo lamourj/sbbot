@@ -17,21 +17,32 @@ bot.
 
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
-                          ConversationHandler)
+        ConversationHandler)
+from handlers import *
+from data_structures import *
+from interfaces import *
+from datetime import datetime
 import newTravel as NT
 # import newFriend as NF
 
 import logging
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+        level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+tablesManager = TablesManager('sun', 77)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 
 def main():
+    betweenChecks = 1 * 60 * 1000 # 1 minute millis
+    prevChecked = datetime.now().microsecond
+    deleteAfterMinutes = 30
+    checkIntervalMinutes = 120 # 2 hours
+    notificationMinutes = 5
 
     with open("Telegram_API_token.txt", 'r') as Telegram_API_file:
         for line in Telegram_API_file:
@@ -44,11 +55,11 @@ def main():
     dp = updater.dispatcher
 
     conv_handler = ConversationHandler(
-        entry_points=NT.ENTRY_POINTS,
-        states= NT.STATES,
-        fallbacks=NT.FALLBACKS,
-        allow_reentry=True
-    )
+            entry_points=NT.ENTRY_POINTS,
+            states= NT.STATES,
+            fallbacks=NT.FALLBACKS,
+            allow_reentry=True
+            )
     dp.add_handler(conv_handler)
 
     # conv_handler_friend = ConversationHandler(
@@ -69,6 +80,24 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+
+    while(True):
+        currentTime = datetime.now().microsecond
+        if(currentTime - prevChecked > betweenChecks):
+            tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
+            tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMinutes)
+
+    #       uniqueConnexions = tablesManager.getUniqueConnexions(tidsToCheck)
+    #       for connexion, uids in uniqueConnexions:
+    #           Query SBB to check connexion. 
+    #           for problematicConnexions:
+    #               for uid in uids:
+    #                   inform uid about problem.
+
+    #           if(Parser.millisToMinutes(currentTime) - connexion.departureTime == -notificationMinutes):
+    #               for uid in uids:
+    #                   inform uid about train leaving in 5 minutes
 
 
 if __name__ == '__main__':

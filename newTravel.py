@@ -131,7 +131,6 @@ def whenTime(bot, update):
     update.message.reply_text("Please type the time you want to %s. Possible input ..:.., now" % update.message.text[:-8])
     return GET_CONNECTION
 
-
 def getConnection(bot, update):
     idReq = str(update.message.from_user.id)
     logger.info("Wanting to  %s at %s " % (mapUserCurrent[idReq]['by'] , update.message.text))
@@ -180,7 +179,17 @@ def getConnection(bot, update):
 def chooseTrain(bot, update): 
     msg = update.message.text
     if not msg == NO_CONNECTION_MESSAGE:
-        # callFUNTION à JULLIEN(msg, update.message.from_user.id)
+        userMap = mapUserCurrent[update.message.from_user.id]
+        weekly = userMap['typeOrWeekly']
+        #json = userMap[connection]
+        if weekly[0] == '/unique' :
+            tablesManager.addSingularEntry(update.message.from_user.id, json) 
+        else: 
+            for i in range(len(weekly) - 1):
+                tablesManager.addRegularEntry(weekly[i],
+                        update.message.from_user.id, json)
+
+
         x = "do nothing"
 
     return -1;
