@@ -45,10 +45,9 @@ def main():
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
         entry_points=NT.ENTRY_POINTS,
-
         states= NT.STATES,
-
-        fallbacks=NT.FALLBACKS
+        fallbacks=NT.FALLBACKS,
+        allow_reentry=True
     )
     dp.add_handler(conv_handler)
 

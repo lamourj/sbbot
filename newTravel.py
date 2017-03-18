@@ -4,28 +4,16 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 from sbbCffBot import logger
 
-TMP_PICK_DAY, PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(6)
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(5)
 
 def connectionType(bot, update):
     user = update.message.from_user
     logger.info("User %s started a new connection." % (user.first_name))
 
-    reply_keyboard = [['Unique', 'Weekly']]
+    reply_keyboard = [['/unique', '/weekly']]
     update.message.reply_text(
         'Hi, do you want to add a unique connection or a weekly one?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-
-    return TMP_PICK_DAY; 
-
-def pickDayOrSkip(bot, update):
-    user = update.message.from_user
-    logger.info("Journey type of %s: %s" % (user.first_name, update.message.text))
-    if update.message.text == 'Unique':
-        print("UINQUE")
-        return FROM_PROPOSTION
-    else:
-        return PICK_DAY
-
 
 def pickDay(bot, update):
     reply_keyboard = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
@@ -57,11 +45,11 @@ def cancel(bot, update):
 
     return ConversationHandler.END
 
-ENTRY_POINTS = [CommandHandler('newConnection', connectionType)]
+ENTRY_POINTS = [CommandHandler('newConnection', connectionType),
+        CommandHandler('unique', fromProposition),
+        CommandHandler('weekly', pickDay)]
 
 STATES={
-    TMP_PICK_DAY: [CallbackQueryHandler(pickDayOrSkip)],
-
     PICK_DAY: [RegexHandler('^(Unique|Weekly)$', pickDay)],
 
     FROM_PROPOSTION: [RegexHandler('^(Unique|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
