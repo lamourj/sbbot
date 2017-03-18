@@ -4,10 +4,12 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 from sbbCffBot import logger
 
+import re, arrow
+
 import sbbbackend.handlers.query_handler as qh
 import sbbbackend.interfaces.parser as parser
 
-PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION = range(7)
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, TIME, GET_CONNECTION = range(10) 
 
 def connectionType(bot, update):
     user = update.message.from_user
@@ -28,7 +30,6 @@ def pickDay(bot, update):
 
     return FROM_PROPOSTION
 
-
 def fromProposition(bot, update):
     user = update.message.from_user
     logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
@@ -46,7 +47,6 @@ def fromConfirm(bot, update):
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return TO_PROPOSTION
 
-
 def toProposition(bot, update):
     user = update.message.from_user
     logger.info("From of %s: %s" % (user.first_name, update.message.text))
@@ -63,6 +63,7 @@ def toConfirm(bot, update):
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return VIA_PROPOSTION     
+
       
 def viaProposition(bot, update):
     user = update.message.from_user
@@ -80,7 +81,8 @@ def viaConfirm(bot, update):
     reply_keyboard = [[el] for el in listTo]
     update.message.reply_text("Please choose one of the following:", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    return      
+    return ARRIVE_DEPART
+
 
 def skipViaConfirm(bot, update):
     reply_keyboard = [['Yes', 'No']]
@@ -89,7 +91,34 @@ def skipViaConfirm(bot, update):
         'Are you sure ?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-    return 
+    return ARRIVE_DEPART 
+
+def whenStartArrive(bot, update):
+    logger.info("Going via  %s" % update.message.text)
+    reply_keyboard = [["Depart by ..h.."], ["Arrive by ..h.."]]
+    update.message.reply_text("Do you want to arrive or depart by a certain time?", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    return TIME
+
+def whenTime(bot, update):
+    logger.info("Wanting to \"%s\" " % update.message.text)
+
+    update.message.reply_text("Please type the time you want to %s. Possible input ..h.., now, in .. hours " % update.message.text[:-8])
+    return ConversationHandler.END    
+
+def getConnection(bot, update):
+    logger.info("Wanting to  leave at %s " % update.message.text)
+    if re.match('^now$'):
+        present = arrow.now()
+        time = present.hour + ":" + prensent.minute
+    elif re.match('^in \d{1,2} hours$'):
+        print()
+    elif re.match('^\d{0,2}h\d{0,2}$'):
+        print()
+    else:
+        logger.warn("problem with time regex")
+
+
 
 def cancel(bot, update):
     user = update.message.from_user
@@ -117,7 +146,13 @@ STATES={
     VIA_PROPOSTION: [MessageHandler(Filters.text, viaProposition)],
 
     VIA_CONFIRMATION: [MessageHandler(Filters.text, viaConfirm), 
-        CommandHandler('skip', skipViaConfirm)]
+        CommandHandler('skip', skipViaConfirm)], 
+
+    ARRIVE_DEPART: [MessageHandler(Filters.text, whenStartArrive)],
+
+    TIME: [MessageHandler(Filters.text, whenTime)],
+
+    GET_CONNECTION: [RegexHandler('^(now|in \d{1,2} hours|\d{1,2}h\d{1,2}|\d{1,2}:\d{1,2}$', getConnection)]
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]
