@@ -37,3 +37,14 @@ class Parser:
         for i in range(len(stations)):
             parsedStations.append(stations[i]['name'])
         return parsedStations
+
+    @staticmethod
+    def parseHumanReadableTime(hrTime):
+        parsed = hrTime.split()
+        ampm = parsed[-1]
+        parsed = parsed[1].split(':')
+        minutes = int(parsed[0]) * 60 + int(parsed[1])
+        if ampm == 'PM':
+            minutes += 12*60
+
+        return minutes

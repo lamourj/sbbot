@@ -17,5 +17,12 @@ def main():
     # parsed = Parser.parseConnexion(connexion)
     # print(parsed)
 
+    someTime = "3/18/17 7:20 PM"
+    correctTime, parsedTime = 19*60+20, Parser.parseHumanReadableTime(someTime)
+    if not correctTime == parsedTime:
+        print("NOOB")
+    else:
+        print("Hehehehhe")
+
 if __name__ == '__main__':
     main()
