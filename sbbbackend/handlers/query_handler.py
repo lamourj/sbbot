@@ -12,16 +12,16 @@ class QueryHandler:
         self.reqhandler = RequestHandler(apikey)
 
 
-    """
-    Query that will return connexions corresponding to input. Also returns the queries to get
-    nextRequest and prevRequest.
-    Default value for time: now
-    Set departure to False to arrive at the specified time, otherwise True to 
-    depart at the specified time.
-    Departure should only be false if time is specified.
-    type(time)=long
-    """
     def getConnexion(self, fromStation, toStation, viaStation=None, time=None, departure=True):
+        """
+        Query that will return connexions corresponding to input. Also returns the queries to get
+        nextRequest and prevRequest.
+        Default value for time: now
+        Set departure to False to arrive at the specified time, otherwise True to 
+        depart at the specified time.
+        Departure should only be false if time is specified.
+        type(time)=long
+        """
         base = "/connection?from=" + fromStation + "&to=" + toStation
 
         if viaStation is not None:
@@ -35,12 +35,12 @@ class QueryHandler:
         return self.reqhandler.sendrequest(base)
 
 
+    def getDepartures(self, fromStation, time=None):
     """
     Query that will return next departures from specified station.
     Default value for time: now.
     type(time)=long
     """
-    def getDepartures(self, fromStation, time=None):
         base = "/departures?from=" + fromStation
 
         if time is not None:
@@ -49,8 +49,8 @@ class QueryHandler:
         return self.reqhandler.sendrequest(base)
 
 
+    def getStationsFromName(self, userInput):
     """
     Query that will return some stations suggestions according to user input
     """
-    def getStationsFromName(self, userInput):
         return self.reqhandler.sendrequest("/stations?query=" + urlqt(userInput))
