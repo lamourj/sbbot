@@ -17,5 +17,8 @@ class User:
         """ Add a regular connexion to this user.
             day should be a string like "Monday", "Thuesday", ...
         """
-        if connexion not in self.regulars[day]:
-            self.regulars[day].append(connexion)
+        if day not in self.regulars:
+            self.regulars[day] = [connexion]
+        else:
+            if connexion not in self.regulars[day]:
+                self.regulars[day].append(connexion)

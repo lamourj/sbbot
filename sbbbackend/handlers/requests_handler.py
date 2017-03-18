@@ -10,7 +10,7 @@ class RequestsHandler:
         self.baseurl = "free.viapi.ch"
 
     def sendrequest(self, reqstring):
-        """ Send requeste to the API.
+        """ Send request to the API.
             reqstring: request string in the form /XXX.
         """
         fullurl = "https://{}/v1{}".format(self.baseurl, reqstring)
