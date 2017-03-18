@@ -4,7 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 from sbbCffBot import logger
 
-TMP_PICK_DAY, PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(6)
+PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(5)
 
 def connectionType(bot, update):
     user = update.message.from_user
@@ -15,27 +15,28 @@ def connectionType(bot, update):
         'Hi, do you want to add a unique connection or a weekly one?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-    return TMP_PICK_DAY; 
+    return PICK_DAY; 
 
-def pickDayOrSkip(bot, update):
+def pickDayOrConfirm(bot, update):
     user = update.message.from_user
     logger.info("Journey type of %s: %s" % (user.first_name, update.message.text))
     if update.message.text == 'Unique':
         print("UINQUE")
-        return FROM_PROPOSTION
+        reply_keyboard = [['Confirmed']]
+        update.message.reply_text(
+            'Confirm ?',
+            reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     else:
-        return PICK_DAY
+        print("Weekly")
+        reply_keyboard = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
+        'Sarturday', 'Sunday']]
+        update.message.reply_text(
+            'On which day of the week ?',
+            reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-
-def pickDay(bot, update):
-    reply_keyboard = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
-            'Sarturday', 'Sunday']]
-
-    update.message.reply_text(
-        'On which day of the week ?',
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return FROM_PROPOSTION
+
 
 def fromProposition(bot, update):
     user = update.message.from_user
@@ -60,11 +61,10 @@ def cancel(bot, update):
 ENTRY_POINTS = [CommandHandler('newConnection', connectionType)]
 
 STATES={
-    TMP_PICK_DAY: [CallbackQueryHandler(pickDayOrSkip)],
+    TMP_PICK_DAY: [MessageHandler(Filters.text, pickDayOrConfirm)],
 
-    PICK_DAY: [RegexHandler('^(Unique|Weekly)$', pickDay)],
 
-    FROM_PROPOSTION: [RegexHandler('^(Unique|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
+    FROM_PROPOSTION: [RegexHandler('^(Confirmed|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
 
     FROM_CONFIRMACTION: [MessageHandler(Filters.text, fromConfirm)],
 
