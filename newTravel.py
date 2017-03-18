@@ -29,23 +29,41 @@ def connectionType(bot, update):
         'Hi, do you want to add a unique connection or a weekly one?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
+
+
+
 def pickDay(bot, update):
-    reply_keyboard = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
-            'Sarturday', 'Sunday']]
+    daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
+            'Saturday', 'Sunday']
+    userId = str(update.message.from_user.id)
+    if update.message.text == '/weekly':
+        mapUserCurrent[userId] = {'typeOrWeekly': []}
+    elif update.message.text in daysOfWeek:
+        mapUserCurrent[userId]['typeOrWeekly'].append(update.message.text)
 
-    update.message.reply_text(
-        'On which day of the week ?',
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-    return FROM_PROPOSTION
+    logger.info("%s" % (update.message.text))
+    if update.message.text == 'Done':
+        reply_keyboard = [['Proceed to next step']]
+        update.message.reply_text(
+            'Please',
+            reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        return FROM_PROPOSTION
+    else:
+        reply_keyboard = [[i] for i in daysOfWeek if i not in mapUserCurrent[userId]['typeOrWeekly']]
+        reply_keyboard.append(['Done'])
+        update.message.reply_text(
+            'On which day of the week ?',
+            reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        return PICK_DAY
 
 def fromProposition(bot, update):
-    print("here we are")
-    print (update.message.text)
-    mapUserCurrent[str(update.message.from_user.id)] = {'typeOrWeekly': update.message.text}
-    print(mapUserCurrent)
+    userId = str(update.message.from_user.id)
+    if update.message.text == '/unique':
+        mapUserCurrent[userId] = {'typeOrWeekly': []}
+
     user = update.message.from_user
-    logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
+    logger.info("New connection day of %s: %s" % (user.first_name, mapUserCurrent[userId]['typeOrWeekly']))
 
     update.message.reply_text("Where will you be leaving from?")
 
@@ -201,9 +219,9 @@ ENTRY_POINTS = [CommandHandler('newConnection', connectionType),
         CommandHandler('weekly', pickDay)]
 
 STATES={
-    PICK_DAY: [RegexHandler('^(Unique|Weekly)$', pickDay)],
+    PICK_DAY: [RegexHandler('^(Unique|Weekly|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Done)$', pickDay)],
 
-    FROM_PROPOSTION: [RegexHandler('^(Confirmed|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
+    FROM_PROPOSTION: [RegexHandler('^(Proceed to next step)$', fromProposition)], 
 
     FROM_CONFIRMATION: [MessageHandler(Filters.text, fromConfirm)],
 
