@@ -1,88 +1,53 @@
-
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
-                          ConversationHandler)
+                          ConversationHandler, CallbackQueryHandler)
 
-import logging
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+from sbbCffBot import logger
 
-logger = logging.getLogger(__name__)
+TMP_PICK_DAY, PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(6)
 
+def connectionType(bot, update):
+    user = update.message.from_user
+    logger.info("User %s started a new connection." % (user.first_name))
 
-
-
-
-JOURNEY_TYPE, PHOTO, LOCATION, BIO = range(4)
-
-def start(bot, update):
     reply_keyboard = [['Unique', 'Weekly']]
-
     update.message.reply_text(
         'Hi, do you want to add a unique connection or a weekly one?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-    return JOURNEY_TYPE
+    return TMP_PICK_DAY; 
 
-
-
-def journey_type(bot, update):
+def pickDayOrSkip(bot, update):
     user = update.message.from_user
     logger.info("Journey type of %s: %s" % (user.first_name, update.message.text))
-    update.message.reply_text('I see! Please send me a photo of yourself, '
-                              'so I know what you look like, or send /skip if you don\'t want to.',
-                              reply_markup=ReplyKeyboardRemove())
+    if update.message.text == 'Unique':
+        print("UINQUE")
+        return FROM_PROPOSTION
+    else:
+        return PICK_DAY
 
-    return PHOTO
 
+def pickDay(bot, update):
+    reply_keyboard = [['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
+            'Sarturday', 'Sunday']]
 
-def photo(bot, update):
+    update.message.reply_text(
+        'On which day of the week ?',
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
+    return FROM_PROPOSTION
+
+def fromProposition(bot, update):
     user = update.message.from_user
-    photo_file = bot.getFile(update.message.photo[-1].file_id)
-    photo_file.download('user_photo.jpg')
-    logger.info("Photo of %s: %s" % (user.first_name, 'user_photo.jpg'))
-    update.message.reply_text('Gorgeous! Now, send me your location please, '
-                              'or send /skip if you don\'t want to.')
+    logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
 
-    return LOCATION
-
-
-def skip_photo(bot, update):
-    user = update.message.from_user
-    logger.info("User %s did not send a photo." % user.first_name)
-    update.message.reply_text('I bet you look great! Now, send me your location please, '
-                              'or send /skip.')
-
-    return LOCATION
-
-
-def location(bot, update):
-    user = update.message.from_user
-    user_location = update.message.location
-    logger.info("Location of %s: %f / %f"
-                % (user.first_name, user_location.latitude, user_location.longitude))
-    update.message.reply_text('Maybe I can visit you sometime! '
-                              'At last, tell me something about yourself.')
-
-    return BIO
-
-
-def skip_location(bot, update):
-    user = update.message.from_user
-    logger.info("User %s did not send a location." % user.first_name)
-    update.message.reply_text('You seem a bit paranoid! '
-                              'At last, tell me something about yourself.')
-
-    return BIO
-
-
-def bio(bot, update):
-    user = update.message.from_user
-    logger.info("Bio of %s: %s" % (user.first_name, update.message.text))
-    update.message.reply_text('Thank you! I hope we can talk again some day.')
+    bot.sendMessage(chat_id=update.message.chat_id, text="Where will you be leaving from ?")
 
     return ConversationHandler.END
+
+def fromConfirm(bot, update):
+    return ConversationHandler.END
+    
 
 def cancel(bot, update):
     user = update.message.from_user
@@ -92,18 +57,20 @@ def cancel(bot, update):
 
     return ConversationHandler.END
 
-ENTRY_POINTS = [CommandHandler('start', start)]
+ENTRY_POINTS = [CommandHandler('newConnection', connectionType)]
 
 STATES={
-    GENDER: [RegexHandler('^(Unique|Weekly)$', journey_type)],
+    TMP_PICK_DAY: [CallbackQueryHandler(pickDayOrSkip)],
 
-    PHOTO: [MessageHandler(Filters.photo, photo),
-            CommandHandler('skip', skip_photo)],
+    PICK_DAY: [RegexHandler('^(Unique|Weekly)$', pickDay)],
 
-    LOCATION: [MessageHandler(Filters.location, location),
-               CommandHandler('skip', skip_location)],
+    FROM_PROPOSTION: [RegexHandler('^(Unique|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$', fromProposition)], 
 
-    BIO: [MessageHandler(Filters.text, bio)]
+    FROM_CONFIRMACTION: [MessageHandler(Filters.text, fromConfirm)],
+
+    TO: [], 
+    
+    VIA: []
 }
 
 FALLBACKS=[CommandHandler('cancel', cancel)]
