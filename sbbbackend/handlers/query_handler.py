@@ -36,11 +36,11 @@ class QueryHandler:
 
 
     def getDepartures(self, fromStation, time=None):
-    """
-    Query that will return next departures from specified station.
-    Default value for time: now.
-    type(time)=long
-    """
+        """
+        Query that will return next departures from specified station.
+        Default value for time: now.
+        type(time)=long
+        """
         base = "/departures?from=" + fromStation
 
         if time is not None:
@@ -50,7 +50,7 @@ class QueryHandler:
 
 
     def getStationsFromName(self, userInput):
-    """
-    Query that will return some stations suggestions according to user input
-    """
+        """
+        Query that will return some stations suggestions according to user input
+        """
         return self.reqhandler.sendrequest("/stations?query=" + urlqt(userInput))

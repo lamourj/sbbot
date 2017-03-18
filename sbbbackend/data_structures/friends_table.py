@@ -1,7 +1,7 @@
 class FriendsTable:
-"""
-Handles relations of friends for users.
-"""
+    """
+    Handles relations of friends for users.
+    """
 
     def __init__(self):
         self.table = dict()

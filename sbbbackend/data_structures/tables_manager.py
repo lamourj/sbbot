@@ -2,8 +2,8 @@ from day_table import DayTable
 from connexion import Connexion
 
 class TablesManager:
-"""Manages tables for days of week"""
-validDaysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+    """Manages tables for days of week"""
+    validDaysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
     def __init__(self):
         """
