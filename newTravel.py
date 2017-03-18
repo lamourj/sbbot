@@ -5,6 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 from sbbCffBot import logger
 
 import sbbbackend.handlers.query_handler as qh
+import sbbbackend.interfaces.parser as parser
 
 PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION, TO_PROPOSTION, TO_CONFIRMACTION, TO, VIA = range(7)
 
@@ -39,6 +40,7 @@ def fromProposition(bot, update):
 def fromConfirm(bot, update):
     logger.info("Trying to leave from %s" % update.message.text)
     listFrom = qh.QueryHandler().getStationsFromName(update.message.text)
+    listFrom = parser.Parser().parseStations(listFrom)
     reply_keyboard = [[el] for el in listFrom]
     print("We received these proposition")
     print(listFrom)
@@ -59,6 +61,7 @@ def toProposition(bot, update):
 def toConfirm(bot, update):
     logger.info("Trying to go to %s" % update.message.text)
     listTo = qh.QueryHandler().getStationsFromName(update.message.text)
+    listTo = parser.Parser().parseStations(listTo)
     reply_keyboard = [[el] for el in listTo]
     print("We received these proposition")
     print(listTo)
