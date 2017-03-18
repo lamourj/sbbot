@@ -27,7 +27,7 @@ class Parser:
         parsed['departurePlatform'] = connexion['from']['platform']
         parsed['arrivalPlatform'] = connexion['to']['platform']
 
-        parsed['sections'] = [] + parseSections(connexion['sections'])
+        parsed['sections'] = parseSections(connexion['sections'])
         return parsed
 
 
