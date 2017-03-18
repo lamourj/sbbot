@@ -1,3 +1,6 @@
+import datetime
+
+
 class Parser:
     @staticmethod
     def parseConnexion(connexion):
@@ -42,16 +45,28 @@ class Parser:
         return parsedStations
 
     @staticmethod
-    def parseHumanReadableTime(hrTime):
+    def parseHumanReadableTimeToMinutes(hrTime):
         parsed = hrTime.split()
         ampm = parsed[-1]
         parsed = parsed[1].split(':')
         minutes = int(parsed[0]) * 60 + int(parsed[1])
         if ampm == 'PM':
             minutes += 12*60
-
         return minutes
 
     @staticmethod
+    def parseHumanReadableTimeToDayOfYear(hrTime):
+        splitted = hrTime.split()
+        month, day, year = splitted[0].split('/')
+        day, month, year = int(day), int(month), int(year)
+        dayOfYear = datetime.datetime(year, month, day, 10, 10, 10)
+        return int(dayOfYear.strftime('%j'))
+
+
+    @staticmethod
     def millisToMinutes(millis):
+        return millis / (1000 * 60)
+
+    @staticmethod
+    def minutesToMillis(minutes):
         return millis * 1000 * 60
