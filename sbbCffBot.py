@@ -20,9 +20,11 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
                           ConversationHandler)
 import newTravel as NT
 
-
-
-
+import logging
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -48,7 +50,6 @@ def main():
 
         fallbacks=NT.FALLBACKS
     )
-
     dp.add_handler(conv_handler)
 
     # log all errors
