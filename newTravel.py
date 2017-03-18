@@ -3,6 +3,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
                           ConversationHandler, CallbackQueryHandler)
 
 from sbbCffBot import logger
+import sbbbackend.handlers.query_handler as qh
 
 PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMACTION,  TO, VIA = range(5)
 
@@ -30,13 +31,19 @@ def fromProposition(bot, update):
     user = update.message.from_user
     logger.info("New connection day of %s: %s" % (user.first_name, update.message.text))
 
-    bot.sendMessage(chat_id=update.message.chat_id, text="Where will you be leaving from ?")
+    update.message.reply_text("Where will you be leaving from ?")
 
-    return ConversationHandler.END
+    return FROM_CONFIRMACTION
 
 def fromConfirm(bot, update):
+    logger.info("Trying to leave from %s" % update.message.text)
+    listFrom = qh.QueryHandler().getStationsFromName(update.message.text)
+    reply_keyboard = [listFrom]
+    print("We received these proposition" +listFrom)
+    update.message.reply_text("Please choose one of the following:", 
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return ConversationHandler.END
-    
+      
 
 def cancel(bot, update):
     user = update.message.from_user
