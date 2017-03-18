@@ -1,6 +1,6 @@
-from day_table import DayTable
-from connexion import Connexion
-from 
+from .day_table import DayTable
+from .train_table import TrainTable
+from .connexion import Connexion
 
 class TablesManager:
     """
@@ -8,26 +8,27 @@ class TablesManager:
 
     All times are in minutes from midnight.
     """
-    validDaysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-
     def __init__(self, currentDayOfWeek, currentDayOfYear):
         """
         Initializes one table for each day of the week for
         regular journeys.
         Initializes a dict of tables for singular entries.
         """
+        self.validDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
-        assert dayOfWeek in validDaysOfWeek, dayOfWeek + " is not a valid day of week."
-        assert dayOfYear >= 0 and dayOfYear < 366, str(dayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
+        assert currentDayOfWeek in self.validDays, currentDayOfWeek + " is not a valid day of week."
+        assert currentDayOfYear >= 0 and currentDayOfYear < 366, str(currentDayOfYear) + " is not a valid day expected: 0 <= currentDayOfYear < 366."
 
         self.regularTables = dict()
-        for dayOfWeek in validDaysOfWeek:
-            self.regularTables[dayOfWeek] = DayTable()
+        for currentDayOfWeek in self.validDays:
+            self.regularTables[currentDayOfWeek] = DayTable()
+
+        self.singularTables = dict()
       
         self.currentDayOfWeek = currentDayOfWeek
         self.currentDayOfYear = currentDayOfYear
         
-        self.todaysTrainTable = trainTable()
+        self.todaysTrainTable = TrainTable()
         self.todaysTable = DayTable()
         self.setTodaysDate(currentDayOfWeek, currentDayOfYear)
 
@@ -37,7 +38,7 @@ class TablesManager:
         and user ID (uid) at the singular day of week (mon, tue, wed, thu,
         fri, sat, sun).
         """
-        assert dayOfWeek in validDaysOfWeek, dayOfWeek + " is not a valid day of week."
+        assert dayOfWeek in self.validDays, dayOfWeek + " is not a valid day of week."
 
         if dayOfWeek == self.currentDayOfWeek: 
             # If dayOfWeek is today, have to add current travel to today's table
@@ -70,7 +71,7 @@ class TablesManager:
         """
         Returns the regular table for the specified day of the week.
         """
-        assert dayOfWeek in validDaysOfWeek, dayOfWeek + " is not a valid day of week."
+        assert dayOfWeek in self.validDays, dayOfWeek + " is not a valid day of week."
         return self.regularTables[dayOfWeek]
 
     def getSingularTableForDayOfYear(self, dayOfYear):
@@ -89,21 +90,24 @@ class TablesManager:
         Update today's date and update today's table.
         Expensive but should be done only once a day.
         """
-        assert currentDayOfWeek in validDaysOfWeek, currentDayOfWeek + " is not a valid day of week."
-        assert currentDayOfYear >= 0 and dayOfYear < 366, str(currentDayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
+        assert currentDayOfWeek in self.validDays, currentDayOfWeek + " is not a valid day of week."
+        assert currentDayOfYear >= 0 and currentDayOfYear < 366, str(currentDayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
 
         self.currentDayOfWeek = currentDayOfWeek
         self.currentDayOfYear = currentDayOfYear
 
         # Build today's tables:
         regularTable = self.regularTables[self.currentDayOfWeek]
-        singularTable = self.singularTables[self.currentDayOfYear]
+        if self.currentDayOfYear in self.singularTables:
+            singularTable = self.singularTables[self.currentDayOfYear]
+        else:
+            singularTable = DayTable()
         
         union = {**regularTable.getTable(), **singularTable.getTable()}
         self.todaysTable = DayTable(table=union)
 
-        self.todaysTrainTable = dict()
-        for tid in self.todaysTable:
+        self.todaysTrainTable = TrainTable()
+        for tid in self.todaysTable.table:
             entries = self.todaysTable[tid]
             for uid, connexion in entries:
                 self.todaysTrainTable.addConnexion(tid, connexion)
@@ -121,7 +125,7 @@ class TablesManager:
                 del self.todaysTable[tid]
 
 
-    def getTidsToCheck(self, currentTime, delay):
+    def getTidsToCheck(self, currentTime, interval):
         """
         Returns all the tid of the trains that are more than +/- delay 
         from now.
@@ -129,6 +133,22 @@ class TablesManager:
         tids = []
         for tid in self.todaysTrainTable:
             departureTime, arrivalTime = self.todaysTrainTable[tid]
-            delayToNow = min(abs(departureTime-delay), abs(arrivalTime-delay))
-            if(delayToNow > delay):
+            delayToNow = min(abs(currentTime - departureTime), abs(arrivalTime - currentTime))
+            if(delayToNow > interval):
                 tids.append(tid)
+
+
+    def getUniqueConnexions(self, tids):
+        """
+        Returns unique connexions to check for current today's table.
+        """
+        uniqueConnexions = dict() # connexion, uids
+
+        for tid in tids:
+            for uid, connexion in self.todaysTable[tid]:
+                if connexion not in uniqueConnexions:
+                    uniqueConnexions[connexion] = [uid]
+                else:
+                    uniqueConnexions[connexions].append(uid)
+
+        return uniqueConnexions

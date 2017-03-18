@@ -1,4 +1,4 @@
-from connexion import Connexion 
+from .connexion import Connexion 
 
 class DayTable:
     """
@@ -6,9 +6,8 @@ class DayTable:
         users are interested in.
     """
 
-
     def __init__(self, table=None):
-        if(table=None):
+        if(table==None):
             self.table = dict()
         else:
             self.table = table.copy()

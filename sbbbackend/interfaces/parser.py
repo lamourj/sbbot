@@ -46,3 +46,6 @@ class Parser:
 
         return minutes
 
+    @staticmethod
+    def millisToMinutes(millis):
+        return millis * 1000 * 60
