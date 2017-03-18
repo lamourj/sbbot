@@ -14,31 +14,22 @@ logger = logging.getLogger(__name__)
 
 
 
-GENDER, PHOTO, LOCATION, BIO = range(4)
+JOURNEY_TYPE, PHOTO, LOCATION, BIO = range(4)
 
 def start(bot, update):
-    reply_keyboard = [['Boy', 'Girl', 'Other']]
+    reply_keyboard = [['Unique', 'Weekly']]
 
     update.message.reply_text(
-        'Hi! My name is Professor Bot. I will hold a conversation with you. '
-        'Send /cancel to stop talking to me.\n\n'
-        'Are you a boy or a girl?',
+        'Hi, do you want to add a unique connection or a weekly one?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-    return GENDER
+    return JOURNEY_TYPE
 
 
-def cancel(bot, update):
+
+def journey_type(bot, update):
     user = update.message.from_user
-    logger.info("User %s canceled the conversation." % user.first_name)
-    update.message.reply_text('Bye! I hope we can talk again some day.',
-                              reply_markup=ReplyKeyboardRemove())
-
-    return ConversationHandler.END
-
-def gender(bot, update):
-    user = update.message.from_user
-    logger.info("Gender of %s: %s" % (user.first_name, update.message.text))
+    logger.info("Journey type of %s: %s" % (user.first_name, update.message.text))
     update.message.reply_text('I see! Please send me a photo of yourself, '
                               'so I know what you look like, or send /skip if you don\'t want to.',
                               reply_markup=ReplyKeyboardRemove())
@@ -93,11 +84,18 @@ def bio(bot, update):
 
     return ConversationHandler.END
 
+def cancel(bot, update):
+    user = update.message.from_user
+    logger.info("User %s canceled the conversation." % user.first_name)
+    update.message.reply_text('Bye! I hope we can talk again some day.',
+                              reply_markup=ReplyKeyboardRemove())
+
+    return ConversationHandler.END
 
 ENTRY_POINTS = [CommandHandler('start', start)]
 
 STATES={
-    GENDER: [RegexHandler('^(Boy|Girl|Other)$', gender)],
+    GENDER: [RegexHandler('^(Unique|Weekly)$', journey_type)],
 
     PHOTO: [MessageHandler(Filters.photo, photo),
             CommandHandler('skip', skip_photo)],
