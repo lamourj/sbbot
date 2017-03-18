@@ -6,7 +6,7 @@ from interfaces import *
 API_KEY = "V001CE953B0F-8B55-41EA-BD81-A366B72523BC"
 
 def main():
-    handler = QueriesHandler()
+    handler = QueryHandler()
     json = handler.getConnexion("Aigle", "Zürich")
 
     connexion = json['connections'][0]
