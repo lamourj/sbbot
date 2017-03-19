@@ -91,15 +91,12 @@ def main():
         currentTime = time.time()
         if(currentTime - prevChecked > betweenChecks):
             prevChecked = currentTime
-            print('Entered if')
             # tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
             tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMillis)
 
-            print("todaysTrainTable: " + str(tablesManager.getTodaysTrainTable()))
-            print("todaysTable: " + str(tablesManager.todaysTable.table))
-
-            print('tidsToCheck: ' + str(tidsToCheck))
-            print(tablesManager.regularTables)
+            # print("todaysTrainTable: " + str(tablesManager.getTodaysTrainTable()))
+            # print("todaysTable: " + str(tablesManager.todaysTable.table))
+            # print('tidsToCheck: ' + str(tidsToCheck))
 
             for uid in tablesManager.todaysTable.table:
                 for tid, connexion in tablesManager.todaysTable.table[uid]:
@@ -110,21 +107,6 @@ def main():
                             bot.sendMessage(uid, message)
                             sentNotifications[(uid, connexion)] = True
 
-
-
-
-
-    #       uniqueConnexions = tablesManager.getUniqueConnexions(tidsToCheck)
-    #       for connexion, uids in uniqueConnexions:
-    #           Query SBB to check connexion. 
-    #           for problematicConnexions:
-    #               for uid in uids:
-    #                   inform uid about problem.
-
-    #           if(Parser.millisToMinutes(currentTime) - connexion.departureTime == -notificationMillis):
-    #               for uid in uids:
-    #                   inform uid about train leaving in 5 minutes
-        
 
     print('exit while')
 

@@ -214,16 +214,12 @@ def chooseTrain(bot, update):
                 index = i
 
         weekly = userMap['typeOrWeekly']
-        print("\n\n weekly: " + str(weekly))
         if weekly == [] :
-            print("YO DUDE")
             tablesManager.addSingularEntry(update.message.chat.id, mapUserCurrent[idReq]['jsons'][index])
         else: 
             for i in range(len(weekly)):
-                print(weekly[i])
-                print(update.message.chat.id)
-                print(mapUserCurrent[idReq]['jsons'][index])
                 tablesManager.addRegularEntry(weekly[i], update.message.chat.id, mapUserCurrent[idReq]['jsons'][index])
+
 
     return -1;
 
