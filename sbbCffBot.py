@@ -44,11 +44,12 @@ def createMessage(currentTime, connexion):
 
 def main():
     # betweenChecks = 1 * 60 * 1000 # 1 minute millis
+    sentNotifications = dict()
+
     betweenChecks = 15 # 20 seconds 
     prevChecked = time.time()
     deleteAfterMinutes = 30
     checkIntervalMillis = Parser().minutesToMillis(2 * 60) # 2 hours
-    print("checkIntervalMillis: " + str(checkIntervalMillis))
     notificationMillis = 5 * 60 * 1000
 
     with open("Telegram_API_token.txt", 'r') as Telegram_API_file:
@@ -104,8 +105,10 @@ def main():
                 for tid, connexion in tablesManager.todaysTable.table[uid]:
                     depart = dt.datetime.strptime(connexion.departureTime, "%m/%d/%y %I:%M %p").timestamp()
                     if tid in tidsToCheck and depart - currentTime < notificationMillis:
-                        message = createMessage(currentTime, connexion)
-                        bot.sendMessage(uid, message)
+                        if (uid, connexion) not in sentNotifications:
+                            message = createMessage(currentTime, connexion)
+                            bot.sendMessage(uid, message)
+                            sentNotifications[(uid, connexion)] = True
 
 
 
