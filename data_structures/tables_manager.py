@@ -34,7 +34,7 @@ class TablesManager:
         self.setTodaysDate(currentDayOfWeek, currentDayOfYear)
 
     def addRegularEntry(self, dayOfWeek, uid, json):
-        sections = Parser.parseConnexion(json)['sections']
+        sections = json['sections']
         for section in sections:
             tid = section['tid']
             departure = section['from']
@@ -48,7 +48,7 @@ class TablesManager:
             arrivalTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(arrivalTime))
             newConnexion = Connexion(tid, departure, arrival, departureTime, arrivalTime, departurePlatform, arrivalPlatform)
 
-            addRegularEntryHelper(self, dayOfWeek, uid, newConnexion)
+            self.addRegularEntryHelper(dayOfWeek, uid, newConnexion)
 
     def addRegularEntryHelper(self, dayOfWeek, uid, connexion):
         """
@@ -67,7 +67,7 @@ class TablesManager:
 
 
     def addSingularEntry(self, uid, json):
-        sections = Parser.parseConnexion(json)['sections']
+        sections = json['sections']
 
         for section in sections:
             tid = section['tid']
@@ -81,7 +81,7 @@ class TablesManager:
             newConnexion = Connexion(tid, departure, arrival, departureTime, arrivalTime, departurePlatform, arrivalPlatform)
 
             dayOfYear = Parser.parseHumanReadableTimeToDayOfYear(departureTime)
-            addSingularEntryHelper(self, dayOfYear, uid, newConnexion)
+            self.addSingularEntryHelper(dayOfYear, uid, newConnexion)
 
 
     def addSingularEntryHelper(self, dayOfYear, uid, connexion):
@@ -99,9 +99,14 @@ class TablesManager:
         if dayOfYear not in self.singularTables:
             self.singularTables[dayOfYear] = DayTable()
 
+        print('connexion.tid: ' + str(connexion.tid) + ' connexion.departure ' + str(connexion.departure))
+
         self.todaysTrainTable.addConnexion(connexion)
 
-        self.singularTables[dayOfYear].addConnexionForDay(uid, tid, connexion)
+        self.singularTables[dayOfYear].addConnexionForDay(uid, connexion.tid, connexion)
+
+        print(self.todaysTrainTable.table)
+        print('completed')
 
 
     def getRegularTableForDayOfWeek(self, dayOfWeek):
@@ -127,6 +132,7 @@ class TablesManager:
         Update today's date and update today's table.
         Expensive but should be done only once a day.
         """
+        print('Set todays date')
         assert currentDayOfWeek in self.validDays, currentDayOfWeek + " is not a valid day of week."
         assert currentDayOfYear >= 0 and currentDayOfYear < 366, str(currentDayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
 
@@ -155,7 +161,7 @@ class TablesManager:
         Removes trains for which train.arrivalTime > currentTime + delay
         from today's trainstable.
         """
-        for tid in self.todaysTable:
+        for tid in self.todaysTable.table:
             if(self.todaysTrainTable.getTimesForTid[1] > currentTime + delay):
                 # if train.arrivalTime > currentTime + delay (which delay??), can unlook train TODO delay
                 del self.todaysTrainTable[tid]
@@ -168,7 +174,7 @@ class TablesManager:
         from now.
         """
         tids = []
-        for tid in self.todaysTrainTable:
+        for tid in self.todaysTrainTable.table:
             departureTime, arrivalTime = self.todaysTrainTable[tid]
             delayToNow = min(abs(currentTime - departureTime), abs(arrivalTime - currentTime))
             if(delayToNow > interval):
@@ -189,3 +195,7 @@ class TablesManager:
                     uniqueConnexions[connexions].append(uid)
 
         return uniqueConnexions
+
+    def getTodaysTrainTable(self):
+        return self.todaysTrainTable.table
+

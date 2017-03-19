@@ -21,9 +21,10 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 from handlers import *
 from data_structures import *
 from interfaces import *
-from datetime import datetime
+import time
 import newTravel as NT
 # import newFriend as NF
+from config import *
 
 import logging
 # Enable logging
@@ -31,15 +32,15 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
         level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-tablesManager = TablesManager('Sunday', 77)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 
 def main():
-    betweenChecks = 1 * 60 * 1000 # 1 minute millis
-    prevChecked = datetime.now().microsecond
+    # betweenChecks = 1 * 60 * 1000 # 1 minute millis
+    betweenChecks = 2 # 20 seconds 
+    prevChecked = time.time()
     deleteAfterMinutes = 30
     checkIntervalMinutes = 120 # 2 hours
     notificationMinutes = 5
@@ -76,17 +77,19 @@ def main():
     # Start the Bot
     updater.start_polling()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+
 
 
     while(True):
-        currentTime = datetime.now().microsecond
+        currentTime = time.time()
         if(currentTime - prevChecked > betweenChecks):
-            tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
-            tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMinutes)
+            prevChecked = currentTime
+            print('Entered if')
+            # tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
+            # tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMinutes)
+
+            print(tablesManager.getTodaysTrainTable())
+            print(str(tablesManager))
 
     #       uniqueConnexions = tablesManager.getUniqueConnexions(tidsToCheck)
     #       for connexion, uids in uniqueConnexions:
@@ -98,6 +101,14 @@ def main():
     #           if(Parser.millisToMinutes(currentTime) - connexion.departureTime == -notificationMinutes):
     #               for uid in uids:
     #                   inform uid about train leaving in 5 minutes
+        
+
+    print('exit while')
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT. This should be used most of the time, since
+    # start_polling() is non-blocking and will stop the bot gracefully.
+    updater.idle()
 
 
 if __name__ == '__main__':

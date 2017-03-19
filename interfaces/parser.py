@@ -3,7 +3,7 @@ import datetime
 
 class Parser:
     @staticmethod
-    def parseConnexion(connexion, showSections=False):
+    def parseConnexion(connexion, showSections=True):
         def parseSections(sections):
             parsedSections = []
             size = len(sections)

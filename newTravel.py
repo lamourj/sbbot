@@ -2,13 +2,14 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler, CallbackQueryHandler)
 
-from sbbCffBot import logger
+from sbbCffBot import (logger, tablesManager)
 
 import re, datetime
 
 import handlers.query_handler as qh
 import interfaces.parser as parser
 import interfaces.helper as helper
+from config import *
 
 PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, \
 TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, \
@@ -188,7 +189,7 @@ def getConnection(bot, update):
 
     mapUserCurrent[idReq]['fullJsons'] = queryResponse;
 
-    parsedResponse = [parser.pareConnexion(i) for i in queryResponse]
+    parsedResponse = [parser.Parser().parseConnexion(i) for i in queryResponse['connections']]
     mapUserCurrent[idReq]['jsons'] = parsedResponse;
 
     response = helper.Helper().getConnexionsStrings(queryResponse['connections'][:NUMBER_OF_TRAINS]);
@@ -206,7 +207,7 @@ def chooseTrain(bot, update):
     if not msg == NO_CONNECTION_MESSAGE:
 
         idReq = str(update.message.chat.id)
-        userMap = mapUserCurrent[idReq]['jsons']
+        userMap = mapUserCurrent[idReq]
         strings = helper.Helper().getConnexionsStrings(mapUserCurrent[idReq]['fullJsons']['connections'][:NUMBER_OF_TRAINS]);
         index = 0
         for i in range(len(strings)):
@@ -216,6 +217,7 @@ def chooseTrain(bot, update):
         weekly = userMap['typeOrWeekly']
         if weekly == [] :
             tablesManager.addSingularEntry(update.message.chat.id, mapUserCurrent[idReq]['jsons'][index])
+            print("From newTravel: " + str(tablesManager))
         else: 
             for i in range(len(weekly) - 1):
                 tablesManager.addRegularEntry(weekly[i], update.message.chat.id, mapUserCurrent[idReq]['jsons'][index])
