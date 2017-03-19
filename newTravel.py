@@ -193,7 +193,7 @@ def getConnection(bot, update):
 
     response = helper.Helper().getConnexionsStrings(queryResponse['connections'][:NUMBER_OF_TRAINS]);
     update.message.reply_text("Which train do you want?", 
-        reply_markup=ReplyKeyboardMarkup([response], one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
     # except:
     #     logger.warn("error somewhere")
     #     update.message.reply_text("No connection available?", 
