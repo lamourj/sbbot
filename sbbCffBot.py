@@ -46,7 +46,7 @@ def main():
     # betweenChecks = 1 * 60 * 1000 # 1 minute millis
     sentNotifications = dict()
 
-    betweenChecks = 15 # 20 seconds 
+    betweenChecks = 5 # 20 seconds 
     prevChecked = time.time()
     deleteAfterMinutes = 30
     checkIntervalMillis = Parser().minutesToMillis(2 * 60) # 2 hours
