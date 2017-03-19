@@ -181,12 +181,13 @@ def getConnection(bot, update):
     mapUserCurrent[idReq]['time'] = timeStr
     print(mapUserCurrent[idReq])
     # try:
-    response = helper.Helper().getConnexionsStrings(NUMBER_OF_TRAINS, 
-        mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
+    qhandler = qh.QueryHandler()
+    queryResponse = qhandler.getConnexion( mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
         mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], 
         mapUserCurrent[idReq]['by'])
+    response = helper.Helper().getConnexionsStrings(queryResponse['connections'][:NUMBER_OF_TRAINS]);
     update.message.reply_text("Which train do you want?", 
-        reply_markup=ReplyKeyboardMarkup(response, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup([response], one_time_keyboard=True))
     # except:
     #     logger.warn("error somewhere")
     #     update.message.reply_text("No connection available?", 
