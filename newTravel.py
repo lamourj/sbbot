@@ -9,6 +9,7 @@ import re, datetime
 import handlers.query_handler as qh
 import interfaces.parser as parser
 import interfaces.helper as helper
+from config import *
 
 PICK_DAY, FROM_PROPOSTION, FROM_CONFIRMATION, TO_PROPOSTION, \
 TO_CONFIRMATION, VIA_PROPOSTION, VIA_CONFIRMATION, ARRIVE_DEPART, \
