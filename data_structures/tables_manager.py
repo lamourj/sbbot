@@ -35,8 +35,6 @@ class TablesManager:
         self.setTodaysDate(currentDayOfWeek, currentDayOfYear)
 
     def addRegularEntry(self, dayOfWeek, uid, json):
-        print("I AM CALLED")
-
         sections = json['sections']
         for section in sections:
             tid = section['tid']
@@ -61,10 +59,7 @@ class TablesManager:
         """
         assert dayOfWeek in self.validDays, dayOfWeek + " is not a valid day of week."
 
-        print("current: " + self.currentDayOfWeek)
-        print("dayOW: " + dayOfWeek)
         if dayOfWeek == self.currentDayOfWeek: 
-            print('Same day !')
             # If dayOfWeek is today, have to add current travel to today's table
             self.todaysTable.addConnexionForDay(uid, connexion.tid, connexion)
 
@@ -97,8 +92,6 @@ class TablesManager:
         """
         assert dayOfYear >= 0 and dayOfYear < 366, str(dayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
 
-        print('add in todays table')
-        print("dayOfYear: " + str(dayOfYear) + " currentDayOfYear: " + str(self.currentDayOfYear))
         if dayOfYear == self.currentDayOfYear: 
             # If dayOfYear is today, have to add current travel to today's table
             self.todaysTable.addConnexionForDay(uid, connexion.tid, connexion)
@@ -137,7 +130,7 @@ class TablesManager:
         Update today's date and update today's table.
         Expensive but should be done only once a day.
         """
-        print('Set todays date')
+        print('Setting todays date')
         assert currentDayOfWeek in self.validDays, currentDayOfWeek + " is not a valid day of week."
         assert currentDayOfYear >= 0 and currentDayOfYear < 366, str(currentDayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
 
@@ -181,22 +174,12 @@ class TablesManager:
         tids = []
         for tid in self.todaysTrainTable.table:
             departureTime, arrivalTime = self.todaysTrainTable.table[tid]
-            # departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
-            print("departureTime: " + str(departureTime))
-            print("arrivalTime: " + str(arrivalTime))
 
             departureTime = dt.datetime.strptime(departureTime, "%m/%d/%y %I:%M %p").timestamp()
             arrivalTime = dt.datetime.strptime(arrivalTime, "%m/%d/%y %I:%M %p").timestamp()
-            
-            print('CurrentTime: ' + str(currentTime))
-            print('departureTime: ' + str(departureTime))
-            print('arrivalTime: ' + str(arrivalTime))
 
             delayToNow = min(abs(currentTime - departureTime), abs(arrivalTime - currentTime))
-            print(delayToNow)
             if(delayToNow <= interval):
-            #if(True):
-                print("heyehyeehyeyhe")
                 tids.append(tid)
 
         return tids
