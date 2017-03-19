@@ -2,6 +2,7 @@ from .day_table import DayTable
 from .train_table import TrainTable
 from .connexion import Connexion
 from interfaces import Parser
+import datetime as dt
 
 class TablesManager:
     """
@@ -34,6 +35,8 @@ class TablesManager:
         self.setTodaysDate(currentDayOfWeek, currentDayOfYear)
 
     def addRegularEntry(self, dayOfWeek, uid, json):
+        print("I AM CALLED")
+
         sections = json['sections']
         for section in sections:
             tid = section['tid']
@@ -44,8 +47,8 @@ class TablesManager:
             departurePlatform = section['departurePlatform']
             arrivalPlatform = section['arrivalPlatform']
 
-            departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
-            arrivalTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(arrivalTime))
+            # departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
+            # arrivalTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(arrivalTime))
             newConnexion = Connexion(tid, departure, arrival, departureTime, arrivalTime, departurePlatform, arrivalPlatform)
 
             self.addRegularEntryHelper(dayOfWeek, uid, newConnexion)
@@ -58,7 +61,10 @@ class TablesManager:
         """
         assert dayOfWeek in self.validDays, dayOfWeek + " is not a valid day of week."
 
+        print("current: " + self.currentDayOfWeek)
+        print("dayOW: " + dayOfWeek)
         if dayOfWeek == self.currentDayOfWeek: 
+            print('Same day !')
             # If dayOfWeek is today, have to add current travel to today's table
             self.todaysTable.addConnexionForDay(uid, connexion.tid, connexion)
 
@@ -91,6 +97,8 @@ class TablesManager:
         """
         assert dayOfYear >= 0 and dayOfYear < 366, str(dayOfYear) + " is not a valid day expected: 0 <= dayOfYear < 366."
 
+        print('add in todays table')
+        print("dayOfYear: " + str(dayOfYear) + " currentDayOfYear: " + str(self.currentDayOfYear))
         if dayOfYear == self.currentDayOfYear: 
             # If dayOfYear is today, have to add current travel to today's table
             self.todaysTable.addConnexionForDay(uid, connexion.tid, connexion)
@@ -173,14 +181,25 @@ class TablesManager:
         tids = []
         for tid in self.todaysTrainTable.table:
             departureTime, arrivalTime = self.todaysTrainTable.table[tid]
-            departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
-            arrivalTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(arrivalTime))
-            print("currentTime: " + str(currentTime))
-            print("departTime: " + str(departureTime))
+            # departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
+            print("departureTime: " + str(departureTime))
             print("arrivalTime: " + str(arrivalTime))
+
+            departureTime = dt.datetime.strptime(departureTime, "%m/%d/%y %I:%M %p").timestamp()
+            arrivalTime = dt.datetime.strptime(arrivalTime, "%m/%d/%y %I:%M %p").timestamp()
+            
+            print('CurrentTime: ' + str(currentTime))
+            print('departureTime: ' + str(departureTime))
+            print('arrivalTime: ' + str(arrivalTime))
+
             delayToNow = min(abs(currentTime - departureTime), abs(arrivalTime - currentTime))
-            if(delayToNow > interval):
+            print(delayToNow)
+            if(delayToNow <= interval):
+            #if(True):
+                print("heyehyeehyeyhe")
                 tids.append(tid)
+
+        return tids
 
 
     def getUniqueConnexions(self, tids):
@@ -200,4 +219,3 @@ class TablesManager:
 
     def getTodaysTrainTable(self):
         return self.todaysTrainTable.table
-

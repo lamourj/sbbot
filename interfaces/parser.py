@@ -67,7 +67,7 @@ class Parser:
         month, day, year = splitted[0].split('/')
         day, month, year = int(day), int(month), int(year)
         dayOfYear = datetime.datetime(year, month, day, 10, 10, 10)
-        return int(dayOfYear.strftime('%j'))
+        return int(dayOfYear.strftime('%j')) - 1
 
 
     @staticmethod

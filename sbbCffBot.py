@@ -15,13 +15,14 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, Bot)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
         ConversationHandler)
 from handlers import *
 from data_structures import *
 from interfaces import *
 import time
+import datetime as dt
 import newTravel as NT
 # import newFriend as NF
 from config import *
@@ -36,14 +37,19 @@ logger = logging.getLogger(__name__)
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
+def createMessage(currentTime, connexion):
+    msg = "The train from " + connexion.departure + " to " + connexion.arrival + " is leaving from platform " + connexion.departurePlatform + " at " + connexion.departureTime
+    return msg
+
 
 def main():
     # betweenChecks = 1 * 60 * 1000 # 1 minute millis
-    betweenChecks = 2 # 20 seconds 
+    betweenChecks = 15 # 20 seconds 
     prevChecked = time.time()
     deleteAfterMinutes = 30
-    checkIntervalMinutes = 1200 # 2 hours
-    notificationMinutes = 5
+    checkIntervalMillis = Parser().minutesToMillis(2 * 60) # 2 hours
+    print("checkIntervalMillis: " + str(checkIntervalMillis))
+    notificationMillis = 5 * 60 * 1000
 
     with open("Telegram_API_token.txt", 'r') as Telegram_API_file:
         for line in Telegram_API_file:
@@ -78,21 +84,32 @@ def main():
     updater.start_polling()
 
 
-
+    bot = Bot(TOKEN)
 
     while(True):
         currentTime = time.time()
         if(currentTime - prevChecked > betweenChecks):
             prevChecked = currentTime
             print('Entered if')
-            tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
-            tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMinutes)
+            # tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
+            tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMillis)
 
             print("todaysTrainTable: " + str(tablesManager.getTodaysTrainTable()))
             print("todaysTable: " + str(tablesManager.todaysTable.table))
 
             print('tidsToCheck: ' + str(tidsToCheck))
-            print()
+            print(tablesManager.regularTables)
+
+            for uid in tablesManager.todaysTable.table:
+                for tid, connexion in tablesManager.todaysTable.table[uid]:
+                    depart = dt.datetime.strptime(connexion.departureTime, "%m/%d/%y %I:%M %p").timestamp()
+                    if tid in tidsToCheck and depart - currentTime < notificationMillis:
+                        message = createMessage(currentTime, connexion)
+                        bot.sendMessage(uid, message)
+
+
+
+
 
     #       uniqueConnexions = tablesManager.getUniqueConnexions(tidsToCheck)
     #       for connexion, uids in uniqueConnexions:
@@ -101,7 +118,7 @@ def main():
     #               for uid in uids:
     #                   inform uid about problem.
 
-    #           if(Parser.millisToMinutes(currentTime) - connexion.departureTime == -notificationMinutes):
+    #           if(Parser.millisToMinutes(currentTime) - connexion.departureTime == -notificationMillis):
     #               for uid in uids:
     #                   inform uid about train leaving in 5 minutes
         
