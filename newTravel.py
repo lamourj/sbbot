@@ -80,7 +80,6 @@ def fromConfirm(bot, update):
     return TO_PROPOSTION
 
 def toProposition(bot, update):
-    print(mapUserCurrent)
     mapUserCurrent[str(update.message.from_user.id)]['from'] = update.message.text
     user = update.message.from_user
     logger.info("From of %s: %s" % (user.first_name, update.message.text))
@@ -180,7 +179,7 @@ def getConnection(bot, update):
         return -1
 
     mapUserCurrent[idReq]['time'] = timeStr
-    print(mapUserCurrent[idReq])
+    # print(mapUserCurrent[idReq])
     # try:
     qhandler = qh.QueryHandler()
     queryResponse = qhandler.getConnexion( mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
@@ -216,7 +215,6 @@ def chooseTrain(bot, update):
         weekly = userMap['typeOrWeekly']
         if weekly == [] :
             tablesManager.addSingularEntry(update.message.from_user.id, mapUserCurrent[idReq]['jsons'][index])
-            print("From newTravel: " + str(tablesManager))
         else: 
             for i in range(len(weekly) - 1):
                 tablesManager.addRegularEntry(weekly[i], update.message.from_user.id, mapUserCurrent[idReq]['jsons'][index])

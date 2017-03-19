@@ -42,7 +42,7 @@ def main():
     betweenChecks = 2 # 20 seconds 
     prevChecked = time.time()
     deleteAfterMinutes = 30
-    checkIntervalMinutes = 120 # 2 hours
+    checkIntervalMinutes = 1200 # 2 hours
     notificationMinutes = 5
 
     with open("Telegram_API_token.txt", 'r') as Telegram_API_file:
@@ -85,11 +85,14 @@ def main():
         if(currentTime - prevChecked > betweenChecks):
             prevChecked = currentTime
             print('Entered if')
-            # tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
-            # tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMinutes)
+            tablesManager.removePastTrains(Parser.millisToMinutes(currentTime), deleteAfterMinutes)
+            tidsToCheck = tablesManager.getTidsToCheck(currentTime, checkIntervalMinutes)
 
-            print(tablesManager.getTodaysTrainTable())
-            print(str(tablesManager))
+            print("todaysTrainTable: " + str(tablesManager.getTodaysTrainTable()))
+            print("todaysTable: " + str(tablesManager.todaysTable.table))
+
+            print('tidsToCheck: ' + str(tidsToCheck))
+            print()
 
     #       uniqueConnexions = tablesManager.getUniqueConnexions(tidsToCheck)
     #       for connexion, uids in uniqueConnexions:

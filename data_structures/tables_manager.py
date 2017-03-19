@@ -99,14 +99,11 @@ class TablesManager:
         if dayOfYear not in self.singularTables:
             self.singularTables[dayOfYear] = DayTable()
 
-        print('connexion.tid: ' + str(connexion.tid) + ' connexion.departure ' + str(connexion.departure))
 
         self.todaysTrainTable.addConnexion(connexion)
 
         self.singularTables[dayOfYear].addConnexionForDay(uid, connexion.tid, connexion)
 
-        print(self.todaysTrainTable.table)
-        print('completed')
 
 
     def getRegularTableForDayOfWeek(self, dayOfWeek):
