@@ -10,9 +10,9 @@ class TrainTable:
         if connexion.tid not in self.table:
             self.table[connexion.tid] = (connexion.departureTime, connexion.arrivalTime)
         else:
-            currentTimes = self.table[tid]
+            currentTimes = self.table[connexion.tid]
             newTimes = (min(currentTimes[0], connexion.departureTime), min(currentTimes[1], connexion.arrivalTime))
-            if not newTime == currentTimes:
+            if (True):
                 self.table[connexion.tid] = newTimes
 
 
