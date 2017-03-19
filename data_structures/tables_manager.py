@@ -172,7 +172,12 @@ class TablesManager:
         """
         tids = []
         for tid in self.todaysTrainTable.table:
-            departureTime, arrivalTime = self.todaysTrainTable[tid]
+            departureTime, arrivalTime = self.todaysTrainTable.table[tid]
+            departureTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(departureTime))
+            arrivalTime = Parser.minutesToMillis(Parser.parseHumanReadableTimeToMinutes(arrivalTime))
+            print("currentTime: " + str(currentTime))
+            print("departTime: " + str(departureTime))
+            print("arrivalTime: " + str(arrivalTime))
             delayToNow = min(abs(currentTime - departureTime), abs(arrivalTime - currentTime))
             if(delayToNow > interval):
                 tids.append(tid)
