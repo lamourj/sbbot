@@ -20,8 +20,6 @@ class Helper:
         first = True
         for c in parsed:
             s = ""
-            if not first:
-                s = s + '\n'
             s = s +  c['departureTime']
             s = s +  ' ' 
             if c['tid'] is not None:
@@ -38,7 +36,5 @@ class Helper:
                 s = s +  c['arrivalPlatform'] 
             s = s +  ' ' 
             s = s +  c['arrivalTime'] 
-            s = s +  ' '
-            first = False
-            strings.append(s)
+            strings.append([s])
         return strings
