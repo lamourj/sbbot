@@ -185,6 +185,12 @@ def getConnection(bot, update):
     queryResponse = qhandler.getConnexion( mapUserCurrent[idReq]['from'], mapUserCurrent[idReq]['to'], 
         mapUserCurrent[idReq]['via'], mapUserCurrent[idReq]['time'], 
         mapUserCurrent[idReq]['by'])
+
+    mapUserCurrent[idReq]['fullJsons'] = queryResponse;
+
+    parsedResponse = [parser.pareConnexion(i) for i in queryResponse]
+    mapUserCurrent[idReq]['jsons'] = parsedResponse;
+
     response = helper.Helper().getConnexionsStrings(queryResponse['connections'][:NUMBER_OF_TRAINS]);
     update.message.reply_text("Which train do you want?", 
         reply_markup=ReplyKeyboardMarkup([response], one_time_keyboard=True))
@@ -198,18 +204,20 @@ def getConnection(bot, update):
 def chooseTrain(bot, update): 
     msg = update.message.text
     if not msg == NO_CONNECTION_MESSAGE:
-        userMap = mapUserCurrent[update.message.from_user.id]
+        idReq = str(update.message.from_user.id)
+        userMap = mapUserCurrent[idReq]['jsons']
+        strings = helper.Helper().getConnexionsStrings(mapUserCurrent[idReq]['fullJsons']['connections'][:NUMBER_OF_TRAINS]);
+        index = 0
+        for i in range(len(strings)):
+            if strings[i] == update.message.text:
+                index = i
+
         weekly = userMap['typeOrWeekly']
-        #json = userMap[connection]
-        if weekly[0] == '/unique' :
-            tablesManager.addSingularEntry(update.message.from_user.id, json) 
+        if weekly == [] :
+            tablesManager.addSingularEntry(update.message.from_user.id, mapUserCurrent[idReq]['jsons'][index])
         else: 
             for i in range(len(weekly) - 1):
-                tablesManager.addRegularEntry(weekly[i],
-                        update.message.from_user.id, json)
-
-
-        x = "do nothing"
+                tablesManager.addRegularEntry(weekly[i], update.message.from_user.id, mapUserCurrent[idReq]['jsons'][index])
 
     return -1;
 
