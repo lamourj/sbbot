@@ -24,7 +24,6 @@ def connectionType(bot, update):
     user = update.message.chat
     logger.info("User %s started a new connection." % (user.first_name))
 
-    print(update.chat.id)
     reply_keyboard = [['/unique', '/weekly']]
     update.message.reply_text(
         'Hi, do you want to add a unique connection or a weekly one?',
@@ -223,6 +222,19 @@ def chooseTrain(bot, update):
 
     return -1;
 
+def help(bot, update):
+    reply_keyboard = [["/unique"], ["/weekly"], ["/newConnection"]]
+    update.message.reply_text('Hey ! Glad that you are using SBBot! Here are the commands you may want to use. \n \
+        /unique: get informations for a unique trip\
+        /weekly: get informations for a trip recurring weekly on specific days \
+        /newConnection: let you choose between weekly and unique journey\
+        Don\'t forget, in case of problem, you can always use /cancel to stop the query.',
+                              reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
+def start(bot, update):
+    reply_keyboard = [["/help"]]
+    update.message.reply_text('Welcome to SBBot, the bot that notifies you of train delays and platform change !', reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
 
 def cancel(bot, update):
     user = update.message.chat
@@ -236,7 +248,11 @@ def cancel(bot, update):
 
 ENTRY_POINTS = [CommandHandler('newConnection', connectionType),
         CommandHandler('unique', fromProposition),
-        CommandHandler('weekly', pickDay)]
+        CommandHandler('weekly', pickDay),
+        CommandHandler('help', help),
+        CommandHandler('start', start)]
+        
+
 
 STATES={
     PICK_DAY: [RegexHandler('^(Unique|Weekly|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Done)$', pickDay)],
