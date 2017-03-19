@@ -13,7 +13,7 @@ class Helper:
 
     @staticmethod
     def getConnexionsStrings(connexions):
-        parsed = list(map(lambda x: Parser.parseConnexion(x), connexions))
+        parsed = list(map(lambda x: Parser.parseConnexion(x, False), connexions))
     
         # Pretty print
         strings = []
