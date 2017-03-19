@@ -3,7 +3,7 @@ import datetime
 
 class Parser:
     @staticmethod
-    def parseConnexion(connexion):
+    def parseConnexion(connexion, showSections=False):
         def parseSections(sections):
             parsedSections = []
             size = len(sections)
@@ -33,7 +33,14 @@ class Parser:
         parsed['departurePlatform'] = connexion['from']['platform']
         parsed['arrivalPlatform'] = connexion['to']['platform']
 
-        parsed['sections'] = parseSections(connexion['sections'])
+        sections = parseSections(connexion['sections'])
+        if showSections:
+            parsed['sections'] = sections
+
+        if len(sections) > 0:
+            parsed['tid'] = sections[0]['tid']
+        else:
+            parsed['tid'] = ''
         return parsed
 
 
