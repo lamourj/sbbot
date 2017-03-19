@@ -18,6 +18,8 @@ TIME, GET_CONNECTION, CHOOSE_TRAIN= range(11)
 NUMBER_OF_TRAINS = 3
 NO_CONNECTION_MESSAGE = "Quit :-/"
 
+DEPART_ARRIVE_KEYBOARD = [["Depart by ..h.."], ["Arrive by ..h.."]]
+
 mapUserCurrent = {}
 
 def connectionType(bot, update):
@@ -134,7 +136,7 @@ def whenStartArrive(bot, update):
         mapUserCurrent[str(update.message.chat.id)]['via'] = update.message.text
 
     logger.info("Going via  %s" % update.message.text)
-    reply_keyboard = [["Depart by ..h.."], ["Arrive by ..h.."]]
+    reply_keyboard = DEPART_ARRIVE_KEYBOARD
 
     update.message.reply_text("Do you want to arrive or depart by a certain time?", 
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
@@ -142,7 +144,7 @@ def whenStartArrive(bot, update):
 
 def whenTime(bot, update):
 
-    mapUserCurrent[str(update.message.chat.id)]['by'] =  update.message.text == "Depart by ..h.."
+    mapUserCurrent[str(update.message.chat.id)]['by'] =  update.message.text == DEPART_ARRIVE_KEYBOARD[0][0]
     logger.info("Wanting to \"%s\" " % update.message.text)
 
     update.message.reply_text("Please type the time you want to %s. Possible input ..:.., now" % update.message.text[:-8])
@@ -154,7 +156,7 @@ def getConnection(bot, update):
     time = datetime.datetime.now()
     timeStr = ''
     # if re.match('^now$', update.message.text):
-    if re.match('^\d:\d{0,2}$', update.message.text):
+    if re.match('^\d[:h]\d{0,2}$', update.message.text, re.IGNORECASE):
         h = int(update.message.text[0:1])
         m = int(update.message.text[2:])
         if h > time.hour or (h == time.hour and m >= time.minute):
@@ -162,7 +164,7 @@ def getConnection(bot, update):
         else:
             time = time.replace(hour = h, minute = m) + datetime.timedelta(days=1)
         timeStr = str(int(time.timestamp()*1000))
-    elif re.match('^\d\d:\d{0,2}$', update.message.text):
+    elif re.match('^\d\d[:h]\d{0,2}$', update.message.text, re.IGNORECASE):
         h = int(update.message.text[0:2])
         m = int(update.message.text[3:])
         if h > time.hour or (h == time.hour and m >= time.minute):
@@ -270,11 +272,11 @@ STATES={
     VIA_CONFIRMATION: [MessageHandler(Filters.text, viaConfirm), 
         CommandHandler('skip', skipViaConfirm)], 
 
-    ARRIVE_DEPART: [MessageHandler(Filters.text, whenStartArrive)],
+    ARRIVE_DEPART: [RegexHandler('Yes|No', whenStartArrive)],
 
-    TIME: [MessageHandler(Filters.text, whenTime)],
+    TIME: [RegexHandler('^'+DEPART_ARRIVE_KEYBOARD[0][0]+'|'+DEPART_ARRIVE_KEYBOARD[1][0]+'$', whenTime)],
 
-    GET_CONNECTION: [MessageHandler(Filters.text, getConnection)],
+    GET_CONNECTION: [RegexHandler(re.compile('^now|\d{1,2}[:h]{1}\d{1,2}$', flags=re.IGNORECASE), getConnection)],
 
     CHOOSE_TRAIN: [MessageHandler(Filters.text, chooseTrain)]
 }
