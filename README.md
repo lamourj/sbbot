@@ -1,6 +1,6 @@
 # SBBot
 
-This is a [Telegram](https://telegram.org) bot that provide public transport information in Switzerland. It fetch data from [Viadi](https://www.ubique.ch/projects/viadi/) that also power the SBB/CFF/FFS app.
+This is a [Telegram](https://telegram.org) bot that provide public transport information in Switzerland. It fetches data from [Viadi](https://www.ubique.ch/projects/viadi/) that also powers the SBB/CFF/FFS app.
 It was built during StartHack 2017, a hackathon taking place at the University of St Gallen, by a team of 4 students of EPFL and ETHZ.
 
 ## Install
