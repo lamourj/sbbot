@@ -38,7 +38,10 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 def createMessage(currentTime, connexion):
-    msg = "The train from " + connexion.departure + " to " + connexion.arrival + " is leaving from platform " + connexion.departurePlatform + " at " + connexion.departureTime
+    if not (connexion.departurePlatform == None):
+        msg = "The train from " + connexion.departure + " to " + connexion.arrival + " is leaving from platform " + connexion.departurePlatform + " at " + connexion.departureTime
+    else:
+        msg = "The train from " + connexion.departure + " to " + connexion.arrival + " is leaving at " + connexion.departureTime
     return msg
 
 
