@@ -21,10 +21,10 @@ NO_CONNECTION_MESSAGE = "Quit :-/"
 mapUserCurrent = {}
 
 def connectionType(bot, update):
-    user = update.message.from_user
+    user = update.message.chat
     logger.info("User %s started a new connection." % (user.first_name))
 
-
+    print(update.chat.id)
     reply_keyboard = [['/unique', '/weekly']]
     update.message.reply_text(
         'Hi, do you want to add a unique connection or a weekly one?',
@@ -36,7 +36,7 @@ def connectionType(bot, update):
 def pickDay(bot, update):
     daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
             'Saturday', 'Sunday']
-    userId = str(update.message.from_user.id)
+    userId = str(update.message.chat.id)
     if update.message.text == '/weekly':
         mapUserCurrent[userId] = {'typeOrWeekly': []}
     elif update.message.text in daysOfWeek:
@@ -59,7 +59,7 @@ def pickDay(bot, update):
         return PICK_DAY
 
 def fromProposition(bot, update):
-    userId = str(update.message.from_user.id)
+    userId = str(update.message.chat.id)
     if update.message.text == '/unique':
         mapUserCurrent[userId] = {'typeOrWeekly': []}
 
@@ -80,7 +80,7 @@ def fromConfirm(bot, update):
     return TO_PROPOSTION
 
 def toProposition(bot, update):
-    mapUserCurrent[str(update.message.from_user.id)]['from'] = update.message.text
+    mapUserCurrent[str(update.message.chat.id)]['from'] = update.message.text
     user = update.message.from_user
     logger.info("From of %s: %s" % (user.first_name, update.message.text))
 
@@ -99,7 +99,7 @@ def toConfirm(bot, update):
 
       
 def viaProposition(bot, update):
-    mapUserCurrent[str(update.message.from_user.id)]['to'] = update.message.text
+    mapUserCurrent[str(update.message.chat.id)]['to'] = update.message.text
     user = update.message.from_user
     logger.info("To of %s: %s" % (user.first_name, update.message.text))
 
@@ -130,9 +130,9 @@ def skipViaConfirm(bot, update):
 def whenStartArrive(bot, update):
     res = update.message.text
     if res == 'Yes' or res == 'No': #only if not conrifmed
-        mapUserCurrent[str(update.message.from_user.id)]['via'] = None
+        mapUserCurrent[str(update.message.chat.id)]['via'] = None
     else:
-        mapUserCurrent[str(update.message.from_user.id)]['via'] = update.message.text
+        mapUserCurrent[str(update.message.chat.id)]['via'] = update.message.text
 
     logger.info("Going via  %s" % update.message.text)
     reply_keyboard = [["Depart by ..h.."], ["Arrive by ..h.."]]
@@ -143,14 +143,14 @@ def whenStartArrive(bot, update):
 
 def whenTime(bot, update):
 
-    mapUserCurrent[str(update.message.from_user.id)]['by'] =  update.message.text == "Depart by ..h.."
+    mapUserCurrent[str(update.message.chat.id)]['by'] =  update.message.text == "Depart by ..h.."
     logger.info("Wanting to \"%s\" " % update.message.text)
 
     update.message.reply_text("Please type the time you want to %s. Possible input ..:.., now" % update.message.text[:-8])
     return GET_CONNECTION
 
 def getConnection(bot, update):
-    idReq = str(update.message.from_user.id)
+    idReq = str(update.message.chat.id)
     logger.info("Wanting to  %s at %s " % (mapUserCurrent[idReq]['by'] , update.message.text))
     time = datetime.datetime.now()
     timeStr = ''
@@ -204,7 +204,8 @@ def getConnection(bot, update):
 def chooseTrain(bot, update): 
     msg = update.message.text
     if not msg == NO_CONNECTION_MESSAGE:
-        idReq = str(update.message.from_user.id)
+
+        idReq = str(update.message.chat.id)
         userMap = mapUserCurrent[idReq]
         strings = helper.Helper().getConnexionsStrings(mapUserCurrent[idReq]['fullJsons']['connections'][:NUMBER_OF_TRAINS]);
         index = 0
@@ -214,16 +215,16 @@ def chooseTrain(bot, update):
 
         weekly = userMap['typeOrWeekly']
         if weekly == [] :
-            tablesManager.addSingularEntry(update.message.from_user.id, mapUserCurrent[idReq]['jsons'][index])
+            tablesManager.addSingularEntry(update.message.chat.id, mapUserCurrent[idReq]['jsons'][index])
         else: 
             for i in range(len(weekly) - 1):
-                tablesManager.addRegularEntry(weekly[i], update.message.from_user.id, mapUserCurrent[idReq]['jsons'][index])
+                tablesManager.addRegularEntry(weekly[i], update.message.chat.id, mapUserCurrent[idReq]['jsons'][index])
 
     return -1;
 
 
 def cancel(bot, update):
-    user = update.message.from_user
+    user = update.message.chat
     logger.info("User %s canceled the conversation." % user.first_name)
     update.message.reply_text('Bye! I hope we can talk again some day.',
                               reply_markup=ReplyKeyboardRemove())
