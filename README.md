@@ -33,4 +33,4 @@ To launch the bot server, ````cd sbbot```` and run
 ```
 python3 sbbCffBot.py
 ```
-Your bot should then be available under the username you registred by the GodFather.
+Your bot should then be available under the username you registred by the BotFather.
